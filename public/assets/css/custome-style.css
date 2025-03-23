@@ -1,0 +1,74 @@
+.thongke {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 20px;
+}
+
+.thongke>div {
+    display: flex;
+    border-radius: 5px;
+    background-color: var(--phoenix-navbar-top-bg-color);
+    box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.2);
+}
+
+.thongke>div>.icon {
+    padding: 10px;
+    color: white;
+}
+
+.thongke>div>.body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.thongke>div>.icon>.icon-border {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: green;
+    border-radius: 5px;
+    width: 40px;
+    height: 40px;
+    color: white;
+    font-size: 1rem;
+}
+
+@media (max-width: 1024px) {
+    .thongke {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 568px) {
+    .thongke {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}
+
+.floating-unit {
+    position: absolute;
+    top: 1px;
+    right: 12px;
+    padding: 1rem 1rem;
+    z-index: 2;
+    font-family: var(--phoenix-font-sans-serif);
+    font-size: 0.64rem;
+    transform-origin: 0 0;
+    transition: opacity 0.1s ease-in-out, transform 0.1s ease-in-out;
+    display: inline-block;
+    color: rgba(var(--phoenix-body-color-rgb), 0.65);
+}
+
+.truncate-char {
+    max-width: 200px;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+/* Quan trọng: CSS này đảm bảo các thẻ con cũng không xuống dòng */
+.truncate-char * {
+    display: inline !important;
+    white-space: nowrap !important;
+}
