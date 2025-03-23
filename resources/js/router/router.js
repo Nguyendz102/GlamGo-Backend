@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from "vue-router";
-import Home from "../components/App.vue";
-import About from "../components/About.vue";
+import Home from "../components/Home.vue";
+import Dashboard from "../components/Dashboard.vue";
+import ListProduct from "../components/Products/ListProduct.vue";
+
 
 
 const routes = [
@@ -9,9 +11,18 @@ const routes = [
         component: Home,
         children: [
             {
+                path: "",
+                redirect: "admin/dashboard"
+            },
+            {
                 path: "dashboard",
                 name: "dashboard",
-                component: About,
+                component: Dashboard,
+            },
+            {
+                path: "products",
+                name: "products",
+                component: ListProduct,
             },
         ]
     },

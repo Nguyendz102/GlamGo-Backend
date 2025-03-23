@@ -8,10 +8,10 @@
                         <li class="nav-item">
                             <!-- parent pages-->
                             <div class="nav-item-wrapper">
-                                <a class="nav-link dropdown-indicator label-1" href="#">
-                                    <span class="nav-link-icon"><span data-feather="home"></span></span>
-                                    <span class="nav-link-text">Trang chủ</span>
-                                </a>
+                                <router-link class="nav-link dropdown-indicator label-1" :to="{ name: 'dashboard' }">
+                                    <span class="nav-link-icon"><span data-feather="home"></span></span><span
+                                        class="nav-link-text">Trang chủ</span>
+                                </router-link>
                             </div>
                         </li>
                         <li class="nav-item">
@@ -30,18 +30,19 @@
                                     <ul class="nav collapse parent" data-bs-parent="#navbarVerticalCollapse"
                                         id="nv-social">
                                         <li class="nav-item">
-                                            <a class="nav-link label-1" href="#">
-                                                <span class="nav-link-text-wrapper">
-                                                    <span class="nav-link-text">Danh mục sản phẩm</span>
-                                                </span>
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
                                             <a class="nav-link" href="#">
                                                 <div class="d-flex align-items-center">
-                                                    <span class="nav-link-text"> Danh sách sản phẩm</span>
+                                                    <span class="nav-link-text"> Danh mục sản phẩm</span>
                                                 </div>
                                             </a>
+                                            <!-- more inner pages-->
+                                        </li>
+                                        <li class="nav-item">
+                                            <router-link class="nav-link label-1" :to="{ name: 'products' }">
+                                                <span class="nav-link-text-wrapper">
+                                                    <span class="nav-link-text">Danh sách sản phẩm</span>
+                                                </span>
+                                            </router-link>
                                         </li>
                                     </ul>
                                 </div>
@@ -135,16 +136,6 @@
                                     <span class="nav-link-icon"><span data-feather="toggle-right"></span></span>
                                     <span class="nav-link-text-wrapper">
                                         <span class="nav-link-text">Trạng thái</span>
-                                    </span>
-                                </a>
-                            </div>
-
-                            <!-- parent pages-->
-                            <div class="nav-item-wrapper">
-                                <a class="nav-link label-1" href="#">
-                                    <span class="nav-link-icon"><span data-feather="map"></span></span>
-                                    <span class="nav-link-text-wrapper">
-                                        <span class="nav-link-text">Quốc gia</span>
                                     </span>
                                 </a>
                             </div>
@@ -580,6 +571,7 @@
             </div>
         </div>
         <div class="content">
+            <router-view></router-view>
             <footer class="footer position-absolute">
                 <div class="row g-0 justify-content-between align-items-center h-100">
                     <div class="col-12 col-sm-auto text-center">
