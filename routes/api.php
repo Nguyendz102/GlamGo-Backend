@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Category\CategoryControllerApi;
+use App\Http\Controllers\api\Product\ProductControllerApi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -26,5 +27,10 @@ Route::group(['prefix' => 'categories'], function () {
     Route::post('/post-category', [CategoryControllerApi::class, 'store']);
     Route::post('/edit-category/{id}', [CategoryControllerApi::class, 'update']);
 });
-
+Route::prefix("products")->group(function () {
+    Route::get("/", [ProductControllerApi::class, "index"]);
+    Route::post("/", [ProductControllerApi::class, "store"]);
+    Route::post("/{id}", [ProductControllerApi::class, "update"]);
+    Route::delete("/{id}", [ProductControllerApi::class, "destroy"]);
+});
 // API client App mobile
