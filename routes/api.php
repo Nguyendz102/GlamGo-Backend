@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Category\CategoryControllerApi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,3 +18,13 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+
+// API WEB quản trị
+Route::group(['prefix' => 'categories'], function () {
+    Route::get('/', [CategoryControllerApi::class, 'index']);
+    Route::post('/post-category', [CategoryControllerApi::class, 'store']);
+    Route::post('/edit-category/{id}', [CategoryControllerApi::class, 'update']);
+});
+
+// API client App mobile

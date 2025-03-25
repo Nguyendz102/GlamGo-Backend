@@ -30,13 +30,13 @@
                                     <ul class="nav collapse parent" data-bs-parent="#navbarVerticalCollapse"
                                         id="nv-social">
                                         <li class="nav-item">
-                                            <a class="nav-link" href="#">
-                                                <div class="d-flex align-items-center">
-                                                    <span class="nav-link-text"> Danh mục sản phẩm</span>
-                                                </div>
-                                            </a>
-                                            <!-- more inner pages-->
+                                            <router-link class="nav-link label-1" :to="{ name: 'category' }">
+                                                <span class="nav-link-text-wrapper">
+                                                    <span class="nav-link-text">Danh mục sản phẩm</span>
+                                                </span>
+                                            </router-link>
                                         </li>
+                                        <!-- more inner pages-->
                                         <li class="nav-item">
                                             <router-link class="nav-link label-1" :to="{ name: 'products' }">
                                                 <span class="nav-link-text-wrapper">
