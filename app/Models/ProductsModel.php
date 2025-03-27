@@ -30,10 +30,6 @@ class ProductsModel extends Model
     {
         return $this->belongsTo(ProductImagesModel::class, 'id', 'product_id');
     }
-    public function country()
-    {
-        return $this->belongsTo(CountryModel::class, 'country_id');
-    }
 
     public function ratings() {
         return $this->hasMany(Rating::class, 'product_id');
