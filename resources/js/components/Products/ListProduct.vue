@@ -594,7 +594,7 @@ const populateEditForm = (product) => {
                             </td>
                             <td class="align-middle text-center">{{ product.featured ? 'Có' : 'Không' }}</td>
                             <td class="align-middle text-start white-space-nowrap truncate-char" style="width: 100px;"
-                                data-bs-toggle="tooltip" title="{{ product.meta_title }}">
+                                data-bs-toggle="tooltip" title="Seo tieu de">
                                 {{ product.meta_title }}
                             </td>
                             <td class="align-middle text-start white-space-nowrap truncate-char"
@@ -659,7 +659,7 @@ const populateEditForm = (product) => {
                                                 class="form-control validate set-0 data-value" placeholder="Tên">
                                             <label>Tên</label>
                                             <p v-if="errors.name" class="text-danger mt-2 fs-9 ms-2">{{ errors.name[0]
-                                            }}</p>
+                                                }}</p>
                                         </div>
                                     </div>
 
@@ -669,7 +669,7 @@ const populateEditForm = (product) => {
                                                 class="form-control validate set-0 data-value" placeholder="Mã">
                                             <label>Mã</label>
                                             <p v-if="errors.code" class="text-danger mt-2 fs-9 ms-2">{{ errors.code[0]
-                                            }}</p>
+                                                }}</p>
                                         </div>
                                     </div>
                                     <div class="col-12">
@@ -680,7 +680,7 @@ const populateEditForm = (product) => {
                                             <label>Giá nhập</label>
                                             <p v-if="errors.import_price" class="text-danger mt-2 fs-9 ms-2">{{
                                                 errors.import_price[0]
-                                                }}</p>
+                                            }}</p>
                                         </div>
                                     </div>
                                     <div class="col-12">
@@ -691,7 +691,7 @@ const populateEditForm = (product) => {
                                             <label>Giá sale</label>
                                             <p v-if="errors.price_sale" class="text-danger mt-2 fs-9 ms-2">{{
                                                 errors.price_sale[0]
-                                                }}</p>
+                                            }}</p>
                                         </div>
                                     </div>
 
@@ -719,7 +719,7 @@ const populateEditForm = (product) => {
                                                 class="form-control validate set-0 data-value" placeholder="Slug">
                                             <label>Slug</label>
                                             <p v-if="errors.slug" class="text-danger mt-2 fs-9 ms-2">{{ errors.slug[0]
-                                                }}</p>
+                                            }}</p>
                                         </div>
                                     </div>
                                     <div class="col-12">
@@ -738,7 +738,7 @@ const populateEditForm = (product) => {
                                                 class="form-control set-0 validate data-value" placeholder="Giá">
                                             <label>Giá bán</label>
                                             <p v-if="errors.price" class="text-danger mt-2 fs-9 ms-2">{{ errors.price[0]
-                                            }}</p>
+                                                }}</p>
                                         </div>
                                     </div>
 

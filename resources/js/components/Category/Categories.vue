@@ -22,7 +22,6 @@ const form = reactive({
     status_id: 1,
     country: '',
     parent_id: ''
-
 });
 // khai báo data form edit
 const editForm = reactive({
@@ -120,9 +119,7 @@ const submitEditForm = async () => {
         formEditData.append('images', editForm.images);
         formEditData.append('status_id', editForm.status_id);
         formEditData.append('parent_id', editForm.parent_id);
-
         const response = await axios.post(`/api/categories/edit-category/${editForm.id}`, formEditData);
-
         const modal = document.getElementById('modalEditCategory');
         const modalEdit = Modal.getInstance(modal) || new Modal(modal);
         modalEdit.hide();
@@ -153,6 +150,7 @@ const submitEditForm = async () => {
 };
 const openModalCreate = () => {
     form.value = {};
+    document.getElementById('images').value = '';
     const modal = document.getElementById('modalCreateCategory');
     const modalCreate = new Modal(modal)
     modalCreate.show();
@@ -310,7 +308,7 @@ onMounted(() => {
                                     <select class="form-select" v-model="form.parent_id" name="parent_id">
                                         <option value="">Danh mục</option>
                                         <option v-for="(c, index) in categories" :key="c.id" :value="c.id">{{ c.name
-                                        }}
+                                            }}
                                         </option>
                                     </select>
                                     <label>Danh mục cha</label>
@@ -340,8 +338,8 @@ onMounted(() => {
                                 </div>
                             </div>
                             <div class="col-sm-12 col-md-12">
-                                <input type="file" @change="handleFileChange" name="images" class="form-control"
-                                    placeholder="Chọn ảnh">
+                                <input type="file" @change="handleFileChange" id="images" name="images"
+                                    class="form-control" placeholder="Chọn ảnh">
                                 <div v-if="errors.images" class="text-danger mt-2 fs-9 ms-2">{{ errors.images[0] }}
                                 </div>
                             </div>
@@ -404,7 +402,7 @@ onMounted(() => {
                                 <div class="form-floating">
                                     <select class="form-select" v-model="editForm.parent_id" name="parent_idEdit">
                                         <option v-for="(c, index) in categories" :key="c.id" :value="c.id">{{ c.name
-                                            }}
+                                        }}
                                         </option>
                                     </select>
                                     <label>Danh mục cha</label>

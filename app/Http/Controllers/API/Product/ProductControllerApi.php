@@ -70,7 +70,8 @@ class ProductControllerApi extends Controller
         try {
             if ($files && is_array($files)) {
                 foreach ($files as $file) {
-                    $url = $file->store('/storage/uploads/images', 'public');
+                    $path = $file->store('public/upload');
+                    $url = Storage::url($path);
                     $dataProductImage = array_merge($dataProduct, [
                         "image" => $url,
                         "image_alt" => $url,
