@@ -129,4 +129,77 @@ class ProductControllerApi extends Controller
             return response()->json(["message" => "Đã xảy ra lỗi khi thêm sản phẩm!", "error" => $e->getMessage()], 500);
         }
     }
+    public function update(Request $request)
+    {
+        try {
+            $this->rules['slug'] = 'required|unique:products,slug,' . $request->id;
+            $validator = Validator::make($request->all(), $this->rules, $this->message);
+            if ($validator->fails()) {
+                return response()->json(["message" => $validator->errors()], 422);
+            }
+            $requestData = $request->all();
+
+            // Xử lý ảnh chính
+            if ($request->hasFile('image')) {
+                // Xóa ảnh cũ nếu tồn tại
+                $existingProduct = ProductsModel::find($request->id);
+                if ($existingProduct && $existingProduct->image && Storage::disk('public')->exists(str_replace('/storage/', '', $existingProduct->image))) {
+                    Storage::disk('public')->delete(str_replace('/storage/', '', $existingProduct->image));
+                }
+                // Upload ảnh mới
+                $imagePath = $request->file('image')->store('public/products');
+                $imagePath = Storage::url($imagePath);
+            } else {
+                // Giữ nguyên ảnh cũ nếu không có ảnh mới
+                $existingProduct = ProductsModel::find($request->id);
+                $imagePath = $existingProduct ? $existingProduct->image : null;
+            }
+
+            $data = [
+                'category_id' => $requestData['category_id'],
+                'name' => $requestData['name'],
+                'code' => $requestData['code'],
+                'slug' => $requestData['slug'],
+                'price' => str_replace([','], '', $requestData['price']),
+                'import_price' => str_replace([','], '', $requestData['import_price']),
+                'price_sale' => str_replace([','], '', $requestData['price_sale']),
+                'is_recommen' => $requestData['is_recommen'],
+                'features' => $requestData['features'],
+                'meta_title' => $requestData['meta_title'],
+                'meta_description' => $requestData['meta_description'],
+                'hashtag' => $requestData['hashtag'],
+                'image' => $imagePath,
+                'image_alt' => $requestData['image_alt'],
+                'status' => $requestData['status'],
+            ];
+
+            ProductsModel::where('id', '=', (int)$request->id)->update($data);
+            if ($request->hasFile('related_images')) {
+                // Upload ảnh mới
+                $dataProduct = [
+                    'product_id' => (int)$request->id,
+                    "product_attribute_value_id" => 0,
+                    "status" => 1,
+                ];
+                $this->uploadManyProductImage($request->file('related_images'), $dataProduct);
+            }
+            return response()->json(["message" => "Sản phẩm đã được cập nhật thành công!"], 200);
+        } catch (\Exception $e) {
+            return response()->json(["message" => "Đã xảy ra lỗi khi sửa sản phẩm!", "error" => $e->getMessage()], 500);
+        }
+    }
+    public function destroy($id)
+    {
+        $product = ProductImagesModel::find($id);
+        if ($product) {
+            $imagePath = $product->image;
+            // Xóa ảnh cũ nếu tồn tại
+            if ($imagePath && Storage::disk('public')->exists($imagePath)) {
+                Storage::disk('public')->delete($imagePath);
+            }
+            $product->delete();
+            return response()->json(["message" => "Xóa ảnh thành công!"], 200);
+        }
+        return response()->json(["message" => "Ảnh không tồn tại!"], 404);
+    }
 }

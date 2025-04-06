@@ -36,7 +36,7 @@ const form = reactive({
     is_recommen: 0,
 });
 
-const editForm = ref({
+const editForm = reactive({
     id: null,
     name: "",
     code: "",
@@ -146,21 +146,48 @@ const removeMainImage = (event) => {
     document.getElementById('mainImageUpload').value = '';
 };
 
-// Hàm xóa ảnh liên quan
-const removeRelatedImage = (index, event) => {
+
+// Hàm xóa ảnh đại diện mới chọn
+const removeEditMainImage = (event) => {
     event.preventDefault();
-    previewImages.related.splice(index, 1);
-    form.related_images.splice(index, 1);
+    editPreviewImages.main = editForm.current_image_url;
+};
+
+// Hàm xóa ảnh liên quan
+// ảnh mới edit
+const removeNewRelatedImage = (index, event) => {
+    event.preventDefault();
+    editPreviewImages.related.splice(index, 1);
     if (previewImages.related.length === 0) {
         document.getElementById('relatedImageUpload').value = '';
     }
 };
-
+// ảnh cũ
+const removeOldRelatedImage = (index, event, id) => {
+    event.preventDefault();
+    if (confirm('Bạn có chắc chắn muốn xóa ảnh này không?')) {
+        axios.delete(`/api/products/${id}`)
+            .then(response => {
+                // Sửa lại cách xóa để đảm bảo reactivity
+                editPreviewImages.related.splice(index, 1);
+                editForm.current_related_images = [
+                    ...editForm.current_related_images.slice(0, index),
+                    ...editForm.current_related_images.slice(index + 1)
+                ];
+                fetchProduct();
+                toast.success('Xóa ảnh thành công');
+            })
+            .catch(error => {
+                console.error('Lỗi xóa ảnh:', error);
+                toast.error('Không thể xóa ảnh, vui lòng thử lại!');
+            });
+    }
+}
 // phần edit 
 const previewEditMainImage = (event) => {
     const file = event.target.files[0];
     if (file) {
-        editForm.value.image = file;
+        editForm.image = file;
         const reader = new FileReader();
         reader.onload = (e) => {
             editPreviewImages.main = e.target.result;
@@ -172,7 +199,7 @@ const previewEditMainImage = (event) => {
 const previewEditRelatedImages = (event) => {
     const files = Array.from(event.target.files);
     if (files.length > 0) {
-        editForm.value.related_images = [...editForm.value.related_images, ...files];
+        editForm.related_images = [...editForm.related_images, ...files];
         files.forEach(file => {
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -182,6 +209,7 @@ const previewEditRelatedImages = (event) => {
         });
     }
 };
+
 
 const resetFilters = () => {
     filters.value = { name: '', code: '', country: '' };
@@ -296,13 +324,18 @@ const updateForm = async () => {
     try {
         btnLoading(btnEdit, true);
         editForm.slug = slug(editForm.name);
-        // Tạo FormData và append các trường khác (ngoại trừ image_related và new_image)
         const formData = new FormData();
         for (const key in editForm) {
-            if (key !== 'image_related') {
+            if (key !== 'related_images', key !== 'image') {
                 formData.append(key, editForm[key]);
             }
         }
+        if (editForm.image) {
+            formData.append('image', editForm.image);
+        }
+        editForm.related_images.forEach(file => {
+            formData.append('related_images[]', file);
+        });
         const response = await axios.post(`/api/products/${editForm.id}`, formData, {
             headers: {
                 "Content-Type": "multipart/form-data"
@@ -349,7 +382,10 @@ const openModalShow = (product) => {
     populateEditForm(product)
 }
 const populateEditForm = (product) => {
-    Object.assign(editForm.value, {
+    // Reset các ảnh mới nếu có
+    editPreviewImages.main = null;
+    editPreviewImages.related = [];
+    Object.assign(editForm, {
         id: product.id,
         name: product.name,
         code: product.code,
@@ -374,10 +410,7 @@ const populateEditForm = (product) => {
         is_recommen: product.is_recommen,
         price_sale: formatNumber(product.price_sale),
     });
-    // Reset các ảnh mới nếu có
-    console.log(editForm);
-    editPreviewImages.main = null;
-    editPreviewImages.related = [];
+
 };
 </script>
 <!--  style css cho upload ảnh  -->
@@ -1084,7 +1117,7 @@ const populateEditForm = (product) => {
                                                 </label>
                                             </div>
                                             <!-- Hiển thị ảnh hiện tại hoặc ảnh mới chọn -->
-                                            <div class="image-preview mt-3">
+                                            <div class="image-preview mt-3 d-flex justify-content-center">
                                                 <div class="main-image-container position-relative">
                                                     <img :src="editPreviewImages.main || editForm.current_image_url"
                                                         alt="Main Image" class="rounded shadow-sm preview-main">
@@ -1124,7 +1157,7 @@ const populateEditForm = (product) => {
                                                         class="rounded shadow-sm preview-related">
                                                     <button
                                                         class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1"
-                                                        @click="removeOldRelatedImage(index, $event)">
+                                                        @click="removeOldRelatedImage(index, $event, image.id)">
                                                         <i class="fas fa-times"></i>
                                                     </button>
                                                 </div>
