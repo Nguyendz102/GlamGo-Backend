@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\Category\CategoryControllerApi;
+use App\Http\Controllers\api\Mobile\CategoriesControllerMobile;
+use App\Http\Controllers\api\Mobile\ProductsControllerMobile;
 use App\Http\Controllers\api\Product\ProductControllerApi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -34,3 +36,15 @@ Route::prefix("products")->group(function () {
     Route::delete("/{id}", [ProductControllerApi::class, "destroy"]);
 });
 // API client App mobile
+Route::group(['prefix' => 'v1'], function () {
+    Route::group(['prefix' => 'categories'], function () {
+        // lấy danh sách danh mục  /api/v1/categories
+        Route::get('/', [CategoriesControllerMobile::class, 'index']);
+    });
+    Route::prefix("products")->group(function () {
+        // lấy danh sách sản phẩm /api/v1/products
+        Route::get("/", [ProductsControllerMobile::class, "index"]);
+        // lấy danh sách sản phẩm theo danh mục /api/v1/products/get-products-by-category
+        Route::get("/get-products-by-category", [ProductsControllerMobile::class, "getProductsByCategory"]);
+    });
+});
