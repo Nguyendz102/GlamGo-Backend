@@ -619,7 +619,7 @@ const populateEditForm = (product) => {
                             </td>
                             <td class="align-middle text-start text-wrap">{{ product.name }}</td>
                             <td class="align-middle text-start">
-                                <router-link :to="`/admin/test-product-attribute/${product.id}/${product.code}`">{{
+                                <router-link :to="`/admin/product-attribute/${product.id}/${product.code}`">{{
                                     product.code }}</router-link>
                             </td>
                             <td class="align-middle text-start">{{ product?.category?.name }}</td>

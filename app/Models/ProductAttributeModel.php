@@ -16,7 +16,8 @@ class ProductAttributeModel extends Model
     {
         return $this->hasMany(ProductAttributeValuesModel::class, 'product_attribute_id');
     }
-    public function product(){
+    public function product()
+    {
         return $this->belongsTo(ProductsModel::class, 'product_id');
     }
 }
