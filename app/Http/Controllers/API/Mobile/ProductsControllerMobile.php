@@ -20,7 +20,7 @@ class ProductsControllerMobile extends Controller
             $q->where('status_id', 1);
         });
         $products = $query->paginate(20);
-        return response()->json($products);
+        return response()->json(['message' => 'Thành công', 'data' => $products, 'status' => 200], 200);
     }
 
     public function getProductsByCategory(Request $request)
@@ -37,6 +37,24 @@ class ProductsControllerMobile extends Controller
             $query->where('category_id', $request->category_id);
         }
         $products = $query->paginate(20);
-        return response()->json($products);
+        return response()->json(['message' => 'Thành công', 'data' => $products, 'status' => 200], 200);
+    }
+
+    public function getProductDetails(Request $request)
+    {
+        $query = ProductsModel::with([
+            'productImages:id,product_id,image',
+            'attribute:id,product_id,name',
+            'attribute.attributeValue:id,product_attribute_id,name',
+        ])->where('products.id', $request->id)
+            ->first();
+        $sameCategory = ProductsModel::where('products.category_id', $query->category_id)
+            ->where('products.status', 1)
+            ->where('products.id', '!=', $query->id)
+            ->with('productImages2')
+            ->select('products.name', 'products.id', 'products.image', 'products.slug', 'products.image_alt', 'products.price', 'products.price_sale')
+            ->orderBy('id', 'desc')
+            ->get();
+        return response()->json(['message' => 'Thành công', 'data' => $query, 'sameCategory' => $sameCategory, 'status' => 200], 200);
     }
 }

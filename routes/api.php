@@ -67,6 +67,6 @@ Route::group(['prefix' => 'v1'], function () {
         // lấy danh sách sản phẩm theo danh mục /api/v1/products/get-products-by-category
         Route::get("/get-products-by-category", [ProductsControllerMobile::class, "getProductsByCategory"]);
 
-        // Route::get("/get-products-details", [ProductsControllerMobile::class, "getProductsByCategory"]);
+        Route::get("/get-products-details", [ProductsControllerMobile::class, "getProductDetails"]);
     });
 });

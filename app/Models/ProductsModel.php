@@ -22,7 +22,7 @@ class ProductsModel extends Model
     {
         return $this->hasMany(ProductImagesModel::class, 'product_id');
     }
-    public function  attribute()
+    public function attribute()
     {
         return $this->hasMany(ProductAttributeModel::class, 'product_id');
     }
