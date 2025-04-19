@@ -27,6 +27,6 @@ class CategoriesControllerMobile extends Controller
             ];
         });
 
-        return response()->json($categories);
+        return response()->json($categories, 200);
     }
 }
