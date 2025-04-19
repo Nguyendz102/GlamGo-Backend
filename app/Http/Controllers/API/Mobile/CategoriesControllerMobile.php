@@ -26,7 +26,6 @@ class CategoriesControllerMobile extends Controller
                 'status_id' => $category->status_id,
             ];
         });
-
-        return response()->json($categories, 200);
+        return response()->json(['message' => 'Thành công', 'categories' => $categories, 'status' => 200], 200);
     }
 }

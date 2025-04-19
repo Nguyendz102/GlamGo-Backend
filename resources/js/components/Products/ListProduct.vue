@@ -410,7 +410,6 @@ const populateEditForm = (product) => {
         is_recommen: product.is_recommen,
         price_sale: formatNumber(product.price_sale),
     });
-
 };
 </script>
 <!--  style css cho upload ảnh  -->
@@ -692,7 +691,7 @@ const populateEditForm = (product) => {
                                                 class="form-control validate set-0 data-value" placeholder="Tên">
                                             <label>Tên</label>
                                             <p v-if="errors.name" class="text-danger mt-2 fs-9 ms-2">{{ errors.name[0]
-                                                }}</p>
+                                            }}</p>
                                         </div>
                                     </div>
 
@@ -702,7 +701,7 @@ const populateEditForm = (product) => {
                                                 class="form-control validate set-0 data-value" placeholder="Mã">
                                             <label>Mã</label>
                                             <p v-if="errors.code" class="text-danger mt-2 fs-9 ms-2">{{ errors.code[0]
-                                                }}</p>
+                                            }}</p>
                                         </div>
                                     </div>
                                     <div class="col-12">
@@ -713,7 +712,7 @@ const populateEditForm = (product) => {
                                             <label>Giá nhập</label>
                                             <p v-if="errors.import_price" class="text-danger mt-2 fs-9 ms-2">{{
                                                 errors.import_price[0]
-                                            }}</p>
+                                                }}</p>
                                         </div>
                                     </div>
                                     <div class="col-12">
@@ -724,7 +723,7 @@ const populateEditForm = (product) => {
                                             <label>Giá sale</label>
                                             <p v-if="errors.price_sale" class="text-danger mt-2 fs-9 ms-2">{{
                                                 errors.price_sale[0]
-                                            }}</p>
+                                                }}</p>
                                         </div>
                                     </div>
 
@@ -752,7 +751,7 @@ const populateEditForm = (product) => {
                                                 class="form-control validate set-0 data-value" placeholder="Slug">
                                             <label>Slug</label>
                                             <p v-if="errors.slug" class="text-danger mt-2 fs-9 ms-2">{{ errors.slug[0]
-                                            }}</p>
+                                                }}</p>
                                         </div>
                                     </div>
                                     <div class="col-12">
@@ -771,7 +770,7 @@ const populateEditForm = (product) => {
                                                 class="form-control set-0 validate data-value" placeholder="Giá">
                                             <label>Giá bán</label>
                                             <p v-if="errors.price" class="text-danger mt-2 fs-9 ms-2">{{ errors.price[0]
-                                                }}</p>
+                                            }}</p>
                                         </div>
                                     </div>
 
@@ -1244,6 +1243,198 @@ const populateEditForm = (product) => {
                                 </div>
                             </div>
                         </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="modal fade" id="viewDetailModal" tabindex="-1" aria-labelledby="viewDetailModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-light py-3">
+                        <h5 class="modal-title fw-bold text-primary mb-0">Chi tiết sản phẩm</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="row g-4">
+                            <!-- Cột trái - Ảnh và Thông tin cơ bản -->
+                            <div class="col-lg-6">
+                                <div class="sticky-top" style="top: 1rem;">
+                                    <!-- Ảnh đại diện -->
+                                    <div class="card shadow-sm mb-4">
+                                        <div class="image-display-container">
+                                            <!-- Ảnh chính -->
+                                            <div class="main-image-section mb-4">
+                                                <h6 class="fw-bold text-primary mb-3">Ảnh chính sản phẩm</h6>
+                                                <div class="main-image-wrapper border rounded p-3 bg-light text-center"
+                                                    style="max-height: 350px; min-height: 200px;">
+                                                    <img v-if="editForm.current_image_url"
+                                                        :src="editForm.current_image_url" alt="Main product image"
+                                                        class="img-fluid rounded"
+                                                        style="max-height: 300px; object-fit: contain;">
+                                                    <div v-else
+                                                        class="d-flex align-items-center justify-content-center h-100">
+                                                        <span class="text-muted">Không có ảnh chính</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Ảnh phụ -->
+                                            <div v-if="editForm.current_related_images.length > 0"
+                                                class="related-images-section">
+                                                <h6 class="fw-bold text-primary mb-3">Ảnh phụ sản phẩm</h6>
+                                                <div class="row g-3">
+                                                    <div v-for="(image, index) in editForm.current_related_images"
+                                                        :key="index" class="col-6 col-sm-4 col-md-3">
+                                                        <div
+                                                            class="related-image-wrapper position-relative border rounded p-2 bg-white h-100">
+                                                            <img :src="image.url" :alt="'Product image ' + (index + 1)"
+                                                                class="img-fluid rounded"
+                                                                style="height: 120px; width: 100%; object-fit: cover;">
+                                                            <span
+                                                                class="position-absolute top-0 end-0 bg-secondary text-white px-2 rounded">
+                                                                {{ index + 1 }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div v-else class="alert alert-light border">
+                                                <i class="fas fa-info-circle me-2"></i> Sản phẩm này chưa có ảnh phụ
+                                            </div>
+                                        </div>
+                                        <div class="card-footer bg-transparent border-0 pt-3">
+                                            <h6 class="fw-bold text-primary mb-3">Thông tin cơ bản</h6>
+                                            <dl class="row mb-0">
+                                                <dt class="col-sm-3 text-muted">Tên SP:</dt>
+                                                <dd class="col-sm-9 fw-bold">{{ editForm.name }}</dd>
+
+                                                <dt class="col-sm-3 text-muted">Mã SP:</dt>
+                                                <dd class="col-sm-9 fw-bold text-danger">{{ editForm.code }}</dd>
+
+                                                <dt class="col-sm-3 text-muted">Danh mục:</dt>
+                                                <dd class="col-sm-9 fw-bold">{{ editForm.category_name }}</dd>
+
+                                                <dt class="col-sm-3 text-muted">Quốc gia:</dt>
+                                                <dd class="col-sm-9 fw-bold">{{ editForm.country_name }}</dd>
+
+                                                <dt class="col-sm-3 text-muted">Thông số:</dt>
+                                                <dd class="col-sm-9 fw-bold" v-html="editForm.attribute_description">
+                                                </dd>
+                                            </dl>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Cột phải - Thông số chi tiết -->
+                            <div class="col-lg-6">
+                                <div class="card shadow-sm">
+                                    <div class="card-body">
+                                        <h6 class="fw-bold text-primary mb-4">Thông số </h6>
+                                        <dl class="row mb-0">
+                                            <dt class="col-sm-5 text-muted">Giá bán trước</dt>
+                                            <dd class="col-sm-7 fw-bold text-danger text-decoration-line-through">{{
+                                                editForm.price_sale
+                                                }}
+                                            </dd>
+                                            <dt class="col-sm-5 text-muted">Giá bán</dt>
+                                            <dd class="col-sm-7 fw-bold text-success">{{ editForm.price
+                                            }}
+                                            </dd>
+
+                                            <dt class="col-sm-5 text-muted">Nổi bật</dt>
+                                            <dd class="col-sm-7 fw-bold">
+                                                <span :class="editForm.features == 1 ? 'text-success' : 'text-danger'">
+                                                    {{ editForm.features == 1 ? 'Có' : 'Không' }}
+                                                </span>
+                                            </dd>
+
+                                            <dt class="col-sm-5 text-muted">Đề xuất</dt>
+                                            <dd class="col-sm-7 fw-bold">
+                                                <span
+                                                    :class="editForm.is_recommend == 1 ? 'text-warning' : 'text-danger'">
+                                                    {{ editForm.is_recommend == 1 ? 'Có' : 'Không' }}
+                                                </span>
+                                            </dd>
+
+                                            <dt class="col-sm-5 text-muted">Hashtag</dt>
+                                            <dd class="col-sm-7 fw-bold">
+                                                <div class="d-flex flex-wrap gap-2">
+                                                    <span v-for="(tag, index) in editForm.hashtag.split(',')"
+                                                        :key="index"
+                                                        class="badge bg-primary bg-opacity-10 text-primary">
+                                                        {{ tag.trim() }}
+                                                    </span>
+                                                </div>
+                                            </dd>
+
+                                            <dt class="col-sm-5 text-muted">Slug</dt>
+                                            <dd class="col-sm-7 fw-bold">
+                                                <span @click="openSlug"
+                                                    class="text-primary cursor-pointer d-block mb-2">
+                                                    {{ statusSlug ? 'Ẩn' : 'Xem' }}
+                                                </span>
+
+                                                <transition name="fade">
+                                                    <div v-if="statusSlug" class="mt-2">
+                                                        <a :href="`/${editForm.slug}`"
+                                                            class="text-decoration-none text-truncate d-inline-block text-wrap bg-light rounded p-2"
+                                                            style="max-width: 200px;">
+                                                            {{ editForm.slug }}
+                                                        </a>
+                                                    </div>
+                                                </transition>
+                                            </dd>
+
+                                            <dt class="col-sm-5 text-muted">Trạng thái</dt>
+                                            <dd
+                                                class="col-sm-7 fw-bold fs-10 badge text-truncate px-3 py-2 rounded-pill">
+                                                {{ editForm.status == 1 ? 'Hoạt động' : 'Không hoạt động' }}
+                                            </dd>
+                                            <dt class=" col-sm-5 text-muted">ALT Ảnh</dt>
+                                            <dd class="col-sm-7 fw-bold">{{ editForm.image_alt }}</dd>
+                                        </dl>
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+                            <!-- Thông tin SEO -->
+                            <div div class="card shadow-sm mt-4 col-lg-12">
+                                <div class="card-body">
+                                    <h6 class="fw-bold text-primary mb-4">Thông tin SEO</h6>
+                                    <div class="mb-3">
+                                        <dt class="text-muted">Tiêu đề SEO</dt>
+                                        <dd class="">{{ editForm.meta_title }}</dd>
+                                    </div>
+                                    <div class="mb-3">
+                                        <dt class="text-muted">Từ khóa</dt>
+                                        <dd class="">{{ editForm.keyword }}</dd>
+                                    </div>
+                                    <div class="mb-3">
+                                        <dt class="text-muted">Mô tả ngắn</dt>
+                                        <dd class="">{{ editForm.short_description }}</dd>
+                                    </div>
+                                    <div class="mb-0">
+                                        <dt class="text-muted">Mô tả SEO</dt>
+                                        <dd v-html="(editForm.meta_description)">
+                                        </dd>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="modal-footer bg-light py-3">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-2"></i>Đóng
+                        </button>
                     </div>
                 </div>
             </div>
