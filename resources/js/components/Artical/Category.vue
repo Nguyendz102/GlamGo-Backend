@@ -20,12 +20,23 @@ const toast = useToast();
 const form = reactive({
     name: '',
     slug: '',
-    status: '',
-    parent_id: '0'
+    parent_id: '0',
+    status: '1',
+});
+
+const editForm = reactive({
+    id: '',
+    name: '',
+    slug: '',
+    parent_id: '0',
 });
 
 watch(() => form.name, (newName) => {
     form.slug = slug(newName);
+});
+
+watch(() => editForm.name, (newName) => {
+    editForm.slug = slug(newName);
 });
 // Fetch danh mục
 const fetchArticalCategories = async (page = 1) => {
@@ -78,7 +89,6 @@ const submitAddForm = async () => {
         formData.append('slug', slug(form.slug));
         formData.append('status', form.status);
         formData.append('parent_id', form.parent_id);
-
         const response = await axios.post('/api/artical-categories/post-parent', formData);
         // Đóng modal
         const modal = document.getElementById('modalCreateCategory');
@@ -89,7 +99,7 @@ const submitAddForm = async () => {
         Object.assign(form, {
             name: '',
             slug: '',
-            parent_id: '',
+            parent_id: '0',
             status: '',
         });
         errors.value = {};
@@ -97,7 +107,6 @@ const submitAddForm = async () => {
         // Cập nhật danh sách danh mục
         fetchArticalCategories();
         fetchParent();
-
         toast.success("Thêm thành công!");
     } catch (error) {
         if (error.response && error.response.status === 422) {
@@ -108,13 +117,7 @@ const submitAddForm = async () => {
     }
 };
 
-const editForm = reactive({
-    id: '',
-    name: '',
-    slug: '',
-    parent_id: '',
-    status: '',
-});
+
 
 // Populate edit form
 const populateEditForm = (category) => {
@@ -140,11 +143,10 @@ const submitEditForm = async () => {
     try {
         const formData = {
             name: editForm.name,
-            slug: editForm.slug,
+            slug: slug(editForm.slug),
             status: editForm.status,
             parent_id: editForm.parent_id,
         };
-
         const response = await axios.put(`/api/artical-categories/update-parent/${editForm.id}`, formData);
         // console.log('Category updated:', response.data);
         // Reset edit form
@@ -245,9 +247,13 @@ const submitEditForm = async () => {
                                 ? 'Trống'
                                 : (categories.find(cat => cat.id === category.parent_id)?.name || 'Không xác định')}}
                             </td>
-                            <td class="align-middle text-start" :style="{ color: category.status.color }">
-                                <span class="fs-10 badge" :style="{ backgroundColor: category.status.color }">
-                                    {{ category.status.name }}</span>
+                            <td class="align-middle text-start">
+                                <span
+                                    :class="['fs-10 badge', category.status === 1 ? 'bg-success text-white' : 'bg-danger text-white']">
+                                    {{ category.status === 1
+                                        ? 'Hoạt động'
+                                        : 'Không hoạt động' }}
+                                </span>
                             </td>
                             <td class="align-middle text-center">
                                 <div class="position-relative">
@@ -318,17 +324,17 @@ const submitEditForm = async () => {
                                             errors.parent_id[0] }}</div>
                                     </div>
                                 </div>
-                                <!-- <div class="col-sm-12 col-md-12">
+                                <div class="col-sm-12 col-md-12">
                                     <div class="form-floating">
                                         <select class="form-select" v-model="form.status">
-                                            <option v-for="(status, index) in statusTableName" :key="status.id"
-                                                :value="status.id">{{ status.name }}</option>
+                                            <option value="1">Hoạt động</option>
+                                            <option value="0">Không hoạt động</option>
                                         </select>
                                         <label>Trạng thái</label>
                                         <div v-if="errors.status" class="text-danger mt-2 fs-9 ms-2">{{
                                             errors.status[0] }}</div>
                                     </div>
-                                </div> -->
+                                </div>
 
                                 <div class="col-12 gy-6">
                                     <div class="row g-3 justify-content-center">
@@ -381,17 +387,7 @@ const submitEditForm = async () => {
                                         </div>
                                     </div>
                                 </div>
-                                <!-- <div class="col-sm-12 col-md-12">
-                                    <div class="form-floating">
-                                        <select class="form-select" v-model="editForm.country" name="country">
-                                            <option v-for="(c, index) in country" :key="c.id" :value="c.id">{{ c.name }}
-                                            </option>
-                                        </select>
-                                        <label>Quốc gia</label>
-                                        <div v-if="errors.country" class="text-danger mt-2 fs-9 ms-2">{{
-                                            errors.country[0] }}</div>
-                                    </div>
-                                </div> -->
+
                                 <div class="col-sm-12 col-md-12">
                                     <div class="form-floating">
                                         <input type="text" v-model="editForm.slug" name="slug" class="form-control"
@@ -416,19 +412,17 @@ const submitEditForm = async () => {
                                     </div>
                                 </div>
 
-                                <!-- <div class="col-sm-12 col-md-12">
+                                <div class="col-sm-12 col-md-12">
                                     <div class="form-floating">
                                         <select class="form-select" v-model="editForm.status">
-                                            <option v-for="(status, index) in statusTableName" :key="status.id"
-                                                :value="status.id">
-                                                {{ status.name }}
-                                            </option>
+                                            <option value="1">Hoạt động</option>
+                                            <option value="0">Không hoạt động</option>
                                         </select>
                                         <label>Trạng thái</label>
                                         <div v-if="errors.status" class="text-danger mt-2 fs-9 ms-2">{{
                                             errors.status[0] }}</div>
                                     </div>
-                                </div> -->
+                                </div>
                                 <div class="col-12 gy-6">
                                     <div class="row g-3 justify-content-center">
                                         <div class="col-auto">
