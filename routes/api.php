@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\api\Artical\ArticalCategoryControllerApi;
 use App\Http\Controllers\Api\Category\CategoryControllerApi;
 use App\Http\Controllers\api\Mobile\CategoriesControllerMobile;
 use App\Http\Controllers\api\Mobile\ProductsControllerMobile;
@@ -52,6 +53,15 @@ Route::prefix("product-attribute-value")->group(function () {
     Route::delete("/{id}", [ProductAttributeValueController::class, "destroy"]);
     Route::delete("delete-image/{id}", [ProductAttributeValueController::class, "deleteImage"]);
     Route::delete("delete-image-product-attribute-value/{id}", [ProductAttributeValueController::class, "deleteImageAttributeValue"]);
+});
+
+
+Route::group(['prefix' => 'artical-categories'], function () {
+    Route::get('/', [ArticalCategoryControllerApi::class, 'index']);
+    Route::get('/list', [ArticalCategoryControllerApi::class, 'list']);
+    Route::get("/parent", [ArticalCategoryControllerApi::class, "parent"]);
+    Route::post('/post-parent', [ArticalCategoryControllerApi::class, 'store']);
+    Route::put('/update-parent/{id}', [ArticalCategoryControllerApi::class, 'update']);
 });
 
 

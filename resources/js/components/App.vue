@@ -64,11 +64,11 @@
                                         id="nv-social1">
                                         <!-- Artical Category -->
                                         <li class="nav-item">
-                                            <a class="nav-link" href="#">
+                                            <router-link class="nav-link label-1" :to="{ name: 'articalCategory' }">
                                                 <span class="nav-link-text-wrapper">
-                                                    <span class="nav-link-text">Danh mục bài viết</span>
+                                                    <span class="nav-link-text">Danh mục sản phẩm</span>
                                                 </span>
-                                            </a>
+                                            </router-link>
                                         </li>
                                         <!--End Artical Category -->
                                         <!-- Artical -->

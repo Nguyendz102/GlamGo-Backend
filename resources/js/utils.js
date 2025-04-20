@@ -59,7 +59,6 @@ const dateTimeFormat = (dateStr, format = 'd-m-y') => {
 
 function slug(input) {
     // Chuyển đổi chuỗi thành chữ thường
-    console.log(input);
     let slug = input.toLowerCase();
     // Thay thế các ký tự tiếng Việt có dấu thành không dấu
     slug = slug
