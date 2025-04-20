@@ -19,8 +19,10 @@ class ProductsControllerMobile extends Controller
         $query->whereHas('category', function ($q) {
             $q->where('status_id', 1);
         });
-        $products = $query->paginate(20);
-        return response()->json(['message' => 'Thành công', 'data' => $products, 'status' => 200], 200);
+        $products = $query->paginate(20)->toArray();
+        $products['message'] = 'Thành công';
+        $products['status'] = 200;
+        return response()->json($products, 200);
     }
 
     public function getProductsByCategory(Request $request)
@@ -36,8 +38,10 @@ class ProductsControllerMobile extends Controller
         if ($request->category_id) {
             $query->where('category_id', $request->category_id);
         }
-        $products = $query->paginate(20);
-        return response()->json(['message' => 'Thành công', 'data' => $products, 'status' => 200], 200);
+        $products = $query->paginate(20)->toArray();
+        $products['message'] = 'Thành công';
+        $products['status'] = 200;
+        return response()->json($products, 200);
     }
 
     public function getProductDetails(Request $request)
@@ -55,6 +59,9 @@ class ProductsControllerMobile extends Controller
             ->select('products.name', 'products.id', 'products.image', 'products.slug', 'products.image_alt', 'products.price', 'products.price_sale')
             ->orderBy('id', 'desc')
             ->get();
+        $data = $query->toArray();
+        $data['sameCategory'] = $sameCategory;
+        $data['message'] = 'Thành công';
         return response()->json(['message' => 'Thành công', 'data' => $query, 'sameCategory' => $sameCategory, 'status' => 200], 200);
     }
 }
