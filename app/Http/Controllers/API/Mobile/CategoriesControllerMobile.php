@@ -10,11 +10,12 @@ class CategoriesControllerMobile extends Controller
 {
     public function index()
     {
-        $query = CategoriesModel::with(['status'])->orderBy('created_at', 'desc');
-        $query->where('status_id', 1);
-        $categories = $query->paginate(20);
+        $categories = CategoriesModel::with('status')
+            ->where('status_id', 1)
+            ->orderByDesc('created_at')
+            ->paginate(20);
+
         $categories->getCollection()->transform(function ($category) {
-            $parentCategory = CategoriesModel::find($category->parent_id);
             return [
                 'id' => $category->id,
                 'name' => $category->name,
@@ -22,10 +23,15 @@ class CategoriesControllerMobile extends Controller
                 'slug' => $category->slug,
                 'images' => $category->images,
                 'parent_id' => $category->parent_id,
-                'parent_name' => $parentCategory->name ?? null,
+                'parent_name' => optional(CategoriesModel::find($category->parent_id))->name,
                 'status_id' => $category->status_id,
             ];
         });
-        return response()->json(['message' => 'Thành công', 'categories' => $categories, 'status' => 200], 200);
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Thành công',
+            ...$categories->toArray(),
+        ]);
     }
 }

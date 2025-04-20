@@ -5,6 +5,8 @@ import ListProduct from "../components/Products/ListProduct.vue";
 import Category from "../components/Category/Categories.vue";
 import ProductAttribute from "../components/Products/ListProductAttribute.vue";
 import ProductAttributeValue from "../components/Products/ListProductAttributeValue.vue";
+import ArticalCategory from "../components/Artical/Category.vue";
+
 const routes = [
     {
         path: "/admin",
@@ -40,6 +42,11 @@ const routes = [
                 name: "product-attribute-value",
                 component: ProductAttributeValue,
                 props: true, // Bật props để có thể nhận tham số id trong component
+            },
+            {
+                path: "artical-category",
+                name: "articalCategory",
+                component: ArticalCategory,
             },
         ]
     },
