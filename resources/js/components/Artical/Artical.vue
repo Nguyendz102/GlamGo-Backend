@@ -3,22 +3,20 @@ import { ref, onMounted, reactive, watch } from 'vue';
 import axios from 'axios';
 import { slug, dateTimeFormat } from '../../utils';
 import { useToast } from "vue-toastification";
-import CKEditor from '@ckeditor/ckeditor5-vue';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+
 import { Modal } from "bootstrap";
-import Pagination from '../../Component/Pagination.vue';
+import Pagination from '../Pagination.vue';
 
 const artical = ref([]);
 const products = ref([]);
 const dataPanigate = ref([])
 const categories = ref([]);
-const country = ref([]);
 const loading = ref(true);
 const searchQuery = ref('');
 const isReadOnly = ref(false);
 const errors = ref({});
 const toast = useToast();
-const editor = ClassicEditor;
+// const editor = ClassicEditor;
 const statusTableName = ref('');
 const previewImages = reactive({
     image: '',
@@ -33,8 +31,7 @@ const form = reactive({
     image: '',
     content: '',
     slug: '',
-    status_id: '',
-    country_id: '',
+    status: 1,
 });
 
 watch(() => form.title, (newName) => {
@@ -66,19 +63,6 @@ const fetchArtical = async (page = 1) => {
     }
 };
 
-// Fetch trangj thais
-const fetchStatus = async () => {
-    try {
-        const response = await axios.get('/api/status', {
-            params: {
-                table_name: 'artical'
-            }
-        });
-        statusTableName.value = response.data.data;
-    } catch (error) {
-        console.error('Error fetching statusTableName:', error);
-    }
-};
 // Fetch danh mục
 const fetchArticalCategories = async () => {
     try {
@@ -92,15 +76,7 @@ const fetchArticalCategories = async () => {
     }
 };
 
-// Fetch quốc gia
-const fetchCountries = async () => {
-    try {
-        const response = await axios.get('/api/country');
-        country.value = response.data;
-    } catch (error) {
-        console.error('Error fetching countries:', error);
-    }
-};
+
 // Fetch sản phẩm
 const fetchProduct = async () => {
     try {
@@ -116,9 +92,7 @@ const fetchProduct = async () => {
 onMounted(() => {
     fetchArtical()
     fetchArticalCategories();
-    fetchCountries();
     fetchProduct();
-    fetchStatus();
 });
 // ================================== KHỞI ĐỘNG CKEDITOR 3 =================================
 onMounted(() => {
@@ -230,8 +204,7 @@ const submitAddForm = async () => {
         formData.append('image', form.image);
         formData.append('content', form.content);
         formData.append('slug', form.slug);
-        formData.append('status_id', form.status_id);
-        formData.append('country_id', form.country_id);
+        formData.append('status', form.status);
 
         const response = await axios.post('/api/artical/post-artical', formData);
         // console.log('Category created:', response.data);
@@ -246,8 +219,7 @@ const submitAddForm = async () => {
             image: '',
             content: '',
             slug: '',
-            status_id: '',
-            country_id: '',
+            status: '',
         });
         errors.value = {};
         // Đóng modal
@@ -276,8 +248,7 @@ const editForm = reactive({
     image: null,
     content: '',
     slug: '',
-    status_id: '',
-    country_id: '',
+    status: '',
 });
 
 watch(() => editForm.title, (newName) => {
@@ -297,9 +268,7 @@ const populateEditForm = (artical) => {
         image: '',
         content: artical.content,
         slug: artical.slug,
-        status_id: artical.status_id,
-        country_id: artical.country_id,
-        country_name: artical.country.name,
+        status: artical.status,
         date: artical.created_at,
         status_name: artical.status.name,
     });
@@ -336,8 +305,7 @@ const submitEditForm = async () => {
         formEditData.append('image', editForm.image);
         formEditData.append('content', editForm.content);
         formEditData.append('slug', editForm.slug);
-        formEditData.append('status_id', editForm.status_id);
-        formEditData.append('country_id', editForm.country_id);
+        formEditData.append('status', editForm.status);
         const response = await axios.post(`/api/artical/update-artical/${editForm.id}`, formEditData);
 
         // Reset edit form
@@ -351,8 +319,7 @@ const submitEditForm = async () => {
             image: '',
             content: '',
             slug: '',
-            status_id: '',
-            country_id: '',
+            status: '',
         });
         errors.value = {};
 
@@ -415,15 +382,10 @@ const submitEditForm = async () => {
                     <thead>
                         <tr>
                             <th class="align-middle text-center text-uppercase">Stt</th>
-                            <th class="align-middle text-start text-uppercase text-truncate">Ảnh</th>
+                            <th class="align-middle text-center text-uppercase text-truncate">Ảnh</th>
                             <th class="align-middle text-start text-uppercase text-truncate">Tiêu đề</th>
                             <th class="align-middle text-start text-uppercase text-truncate">Danh mục</th>
                             <th class="align-middle text-start text-uppercase text-truncate">Sản phẩm</th>
-                            <th class="align-middle text-start text-uppercase text-truncate">Quốc gia</th>
-                            <th class="align-middle text-start text-uppercase text-truncate">SEO tiêu đề</th>
-                            <th class="align-middle text-start text-uppercase text-truncate">SEO mô tả</th>
-                            <!-- <th class="align-middle text-start text-uppercase">Nội dung</th> -->
-                            <th class="align-middle text-start text-uppercase text-truncate">Slug</th>
                             <th class="align-middle text-start text-uppercase text-truncate">Trạng thái</th>
                             <th class="align-middle text-center text-uppercase text-truncate">Hành động</th>
                         </tr>
@@ -448,29 +410,20 @@ const submitEditForm = async () => {
                             <td class="align-middle text-start">{{ artical.title }}</td>
                             <td class="align-middle text-start">{{ artical.category_artical.name }}</td>
                             <td class="align-middle text-start">{{ artical.product?.name }}</td>
-                            <td class="align-middle text-start">{{ artical.country.name }}</td>
-                            <td class="align-middle text-start">{{ artical.meta_tittle }}</td>
-                            <td class="align-middle text-start">{{ artical.meta_description }}</td>
-                            <!-- <td class="align-middle text-start" v-html="artical.content"></td> -->
-                            <td class="align-middle text-start">{{ artical.slug }}</td>
-                            <td class="align-middle text-start" :style="{ color: artical.status.color }">
-                                <span class="fs-10 badge" :style="{ backgroundColor: artical.status.color }">
-                                    {{ artical.status.name }}
-                                </span>
+                            <td class="align-middle text-start">
+                                {{ artical.status }}
                             </td>
                             <td class="align-middle text-center">
                                 <div class="position-relative">
-                                        <button
-                                            class="btn btn-edit-show btn-sm btn-phoenix-secondary text-info me-1 fs-10"
-                                            title="Cập nhật" type="button" data-bs-toggle="modal"
-                                            @click="openEditModal(artical)">
-                                            <span class="fas far fa-edit"></span>
-                                        </button>
-                                        <button
-                                            class='btn btn-edit-show btn-sm btn-phoenix-secondary text-info me-1 fs-10'
-                                            @click="openModalShow(artical)" title='Xem chi tiết' type='button'>
-                                            <span class='fas far fa-eye'></span>
-                                        </button>
+                                    <button class="btn btn-edit-show btn-sm btn-phoenix-secondary text-info me-1 fs-10"
+                                        title="Cập nhật" type="button" data-bs-toggle="modal"
+                                        @click="openEditModal(artical)">
+                                        <span class="fas far fa-edit"></span>
+                                    </button>
+                                    <button class='btn btn-edit-show btn-sm btn-phoenix-secondary text-info me-1 fs-10'
+                                        @click="openModalShow(artical)" title='Xem chi tiết' type='button'>
+                                        <span class='fas far fa-eye'></span>
+                                    </button>
 
                                 </div>
                             </td>
@@ -528,6 +481,7 @@ const submitEditForm = async () => {
                                     <div class="form-floating">
                                         <select class="form-select" v-model="form.category_artical_id"
                                             name="category_artical_id">
+                                            <option value="">---Chọn danh mục bài viết---</option>
                                             <option v-for="(c, index) in categories" :key="c.id" :value="c.id">
                                                 {{ c.name }}
                                             </option>
@@ -587,26 +541,13 @@ const submitEditForm = async () => {
                                 </div>
                                 <div class="col-sm-12 col-md-12">
                                     <div class="form-floating">
-                                        <select class="form-select" v-model="form.country_id" name="country_id">
-                                            <option v-for="(c, index) in country" :key="c.id" :value="c.id">{{ c.name }}
-                                            </option>
-                                        </select>
-                                        <label>Quốc gia</label>
-                                        <div v-if="errors.country_id" class="text-danger mt-2 fs-9 ms-2">{{
-                                            errors.country_id[0] }}</div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-12 col-md-12">
-                                    <div class="form-floating">
-                                        <select class="form-select" v-model="form.status_id">
-                                            <option v-for="(status, index) in statusTableName" :key="status.id"
-                                                :value="status.id">
-                                                {{ status.name }}
-                                            </option>
+                                        <select class="form-select" v-model="form.status">
+                                            <option value="1">Hoạt động</option>
+                                            <option value="0">Không hoạt động</option>
                                         </select>
                                         <label>Trạng thái</label>
-                                        <div v-if="errors.status_id" class="text-danger mt-2 fs-9 ms-2">{{
-                                            errors.status_id[0] }}</div>
+                                        <div v-if="errors.status" class="text-danger mt-2 fs-9 ms-2">{{
+                                            errors.status[0] }}</div>
                                     </div>
                                 </div>
 
@@ -735,26 +676,15 @@ const submitEditForm = async () => {
                                 </div>
                                 <div class="col-sm-12 col-md-12">
                                     <div class="form-floating">
-                                        <select class="form-select" v-model="editForm.country_id" name="country_id">
-                                            <option v-for="(c, index) in country" :key="c.id" :value="c.id">{{ c.name }}
-                                            </option>
-                                        </select>
-                                        <label>Quốc gia</label>
-                                        <div v-if="errors.country_id" class="text-danger mt-2 fs-9 ms-2">{{
-                                            errors.country_id[0] }}</div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-12 col-md-12">
-                                    <div class="form-floating">
-                                        <select class="form-select" v-model="editForm.status_id">
+                                        <select class="form-select" v-model="editForm.status">
                                             <option v-for="(status, index) in statusTableName" :key="status.id"
                                                 :value="status.id">
                                                 {{ status.name }}
                                             </option>
                                         </select>
                                         <label>Trạng thái</label>
-                                        <div v-if="errors.status_id" class="text-danger mt-2 fs-9 ms-2">{{
-                                            errors.status_id[0] }}</div>
+                                        <div v-if="errors.status" class="text-danger mt-2 fs-9 ms-2">{{
+                                            errors.status[0] }}</div>
                                     </div>
                                 </div>
 

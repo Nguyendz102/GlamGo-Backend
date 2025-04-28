@@ -66,18 +66,18 @@
                                         <li class="nav-item">
                                             <router-link class="nav-link label-1" :to="{ name: 'articalCategory' }">
                                                 <span class="nav-link-text-wrapper">
-                                                    <span class="nav-link-text">Danh mục sản phẩm</span>
+                                                    <span class="nav-link-text">Danh mục bài viết</span>
                                                 </span>
                                             </router-link>
                                         </li>
                                         <!--End Artical Category -->
                                         <!-- Artical -->
                                         <li class="nav-item">
-                                            <a class="nav-link" href="#">
+                                            <router-link class="nav-link label-1" :to="{ name: 'artical' }">
                                                 <span class="nav-link-text-wrapper">
                                                     <span class="nav-link-text">Danh sách bài viết</span>
                                                 </span>
-                                            </a>
+                                            </router-link>
                                         </li>
                                         <!--End Artical -->
                                     </ul>
