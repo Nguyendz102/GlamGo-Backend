@@ -12,7 +12,7 @@ class ArticalControllerMobile extends Controller
 
     public function index()
     {
-        $query = ArticalModel::orderBy('created_at', 'desc');
+        $query = ArticalModel::orderBy('created_at', 'desc')->where('status', 1);
         $artical = $query->paginate(50)->toArray();
         $artical['message'] = 'Thành công';
         $artical['status'] = 200;
