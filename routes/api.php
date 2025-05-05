@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\api\Artical\ArticalCategoryControllerApi;
+use App\Http\Controllers\api\artical\ArticalControllerApi;
 use App\Http\Controllers\Api\Category\CategoryControllerApi;
+use App\Http\Controllers\api\mobile\ArticalControllerMobile;
 use App\Http\Controllers\api\Mobile\CategoriesControllerMobile;
 use App\Http\Controllers\api\Mobile\ProductsControllerMobile;
 use App\Http\Controllers\api\product\ProductAttributeController;
@@ -64,6 +66,11 @@ Route::group(['prefix' => 'artical-categories'], function () {
     Route::put('/update-parent/{id}', [ArticalCategoryControllerApi::class, 'update']);
 });
 
+Route::group(['prefix' => 'artical'], function () {
+    Route::get('/', [ArticalControllerApi::class, 'index']);
+    Route::post('/post-artical', [ArticalControllerApi::class, 'store']);
+    Route::post('/update-artical/{id}', [ArticalControllerApi::class, 'update']);
+});
 
 // API client App mobile
 Route::group(['prefix' => 'v1'], function () {
@@ -78,5 +85,11 @@ Route::group(['prefix' => 'v1'], function () {
         Route::get("/get-products-by-category", [ProductsControllerMobile::class, "getProductsByCategory"]);
         // lấy chi tiết sản phẩm /api/v1/products/get-products-details
         Route::get("/get-products-details", [ProductsControllerMobile::class, "getProductDetails"]);
+    });
+    Route::group(['prefix' => 'artical'], function () {
+        // lấy danh sách  bài viết  /api/v1/artical
+        Route::get('/', [ArticalControllerMobile::class, 'index']);
+        // lấy danh sách danh mục bài viết  /api/v1/artical/categories
+        Route::get('/categories', [ArticalControllerMobile::class, 'categories']);
     });
 });

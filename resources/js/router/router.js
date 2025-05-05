@@ -6,6 +6,7 @@ import Category from "../components/Category/Categories.vue";
 import ProductAttribute from "../components/Products/ListProductAttribute.vue";
 import ProductAttributeValue from "../components/Products/ListProductAttributeValue.vue";
 import ArticalCategory from "../components/Artical/Category.vue";
+import Artical from "../components/Artical/Artical.vue";
 
 const routes = [
     {
@@ -47,6 +48,11 @@ const routes = [
                 path: "artical-category",
                 name: "articalCategory",
                 component: ArticalCategory,
+            },
+            {
+                path: "artical",
+                name: "artical",
+                component: Artical,
             },
         ]
     },

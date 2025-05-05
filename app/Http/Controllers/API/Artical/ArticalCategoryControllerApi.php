@@ -70,7 +70,6 @@ class ArticalCategoryControllerApi extends Controller
 
         ], [
             'name.required'      => 'Tên danh mục không được để trống.',
-            'status.required'      => 'Tên danh mục không được để trống.',
             'name.string'        => 'Tên danh mục phải là chuỗi.',
             'name.max'           => 'Tên danh mục phải nhỏ hơn 255 ký tự.',
             'slug.required'      => 'Slug không được để trống.',
@@ -97,5 +96,10 @@ class ArticalCategoryControllerApi extends Controller
         ]);
 
         return response()->json($data, 201);
+    }
+    public function list(Request $request)
+    {
+        $articalCategories = CategoriesArticalModel::where('status', 1)->get();
+        return response()->json($articalCategories);
     }
 }

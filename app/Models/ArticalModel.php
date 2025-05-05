@@ -18,13 +18,8 @@ class ArticalModel extends Model
     {
         return $this->belongsTo(CategoriesArticalModel::class, 'category_artical_id');
     }
-    public function country()
-    {
-        return $this->belongsTo(CountryModel::class, 'country_id');
-    }
     public function product()
     {
         return $this->belongsTo(ProductsModel::class, 'product_id');
     }
-
 }

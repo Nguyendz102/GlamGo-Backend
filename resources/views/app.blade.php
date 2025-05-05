@@ -3,6 +3,8 @@
 
 <head>
     <meta charset="utf-8">
+    <script src="{{ asset('/plugins/ckfinder/ckfinder.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('/plugins/ckeditor/ckeditor.js') }}" type="text/javascript"></script>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
