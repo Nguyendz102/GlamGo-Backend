@@ -33,6 +33,7 @@ class ArticalControllerApi extends Controller
             'content' => 'required|string',
             'slug' => 'required|string|max:255|unique:artical,slug',
             'status'    => 'required|in:0,1',
+            'is_hot'    => 'required|in:0,1',
         ], [
             'category_artical_id.required' => 'Danh mục bài viết không được để trống.',
             'category_artical_id.integer' => 'Danh mục bài viết phải là số nguyên.',
@@ -65,6 +66,7 @@ class ArticalControllerApi extends Controller
             'slug.unique' => 'Slug đã tồn tại.',
 
             'status.in'          => 'Trạng thái không hợp lệ.',
+            'is_hot.in'          => 'Bài viết nổi bật không hợp lệ.',
             'status.required' => 'Trạng thái không được để trống.',
 
         ]);

@@ -10,9 +10,15 @@ use Illuminate\Http\Request;
 class ArticalControllerMobile extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
         $query = ArticalModel::orderBy('created_at', 'desc')->where('status', 1);
+        if (!empty($request->category_artical_id)) {
+            $query->where('category_artical_id', $request->category_artical_id);
+        }
+        if (!empty($request->is_hot)) {
+            $query->where('is_hot', 1);
+        }
         $artical = $query->paginate(50)->toArray();
         $artical['message'] = 'Thành công';
         $artical['status'] = 200;
