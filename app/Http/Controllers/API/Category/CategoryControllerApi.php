@@ -28,7 +28,7 @@ class CategoryControllerApi extends Controller
                 'images' => $category->images,
                 'parent_id' => $category->parent_id,
                 'parent_name' => $parentCategory->name ?? null,
-                'status_id' => $category->status_id,
+                'status' => $category->status,
             ];
         });
 
@@ -40,7 +40,7 @@ class CategoryControllerApi extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:categories,slug',
-            'status_id' => 'required|integer',
+            'status' => 'required|integer',
             'images' => 'nullable|sometimes|image|mimes:jpg,jpeg,png,gif|max:2048',
         ], [
             'name.required' => 'Tên danh mục không được để trống.',
@@ -49,7 +49,7 @@ class CategoryControllerApi extends Controller
             'slug.required' => 'Slug không được để trống.',
             'slug.string' => 'Slug phải là chuỗi.',
             'slug.max' => 'Slug phải nhỏ hơn 255 ký tự.',
-            'status_id.required' => 'Trạng thái không được để trống',
+            'status.required' => 'Trạng thái không được để trống',
             'slug.unique' => 'Slug đã tồn tại.',
             'images.image' => 'File tải lên phải là hình ảnh.',
             'images.mimes' => 'Chỉ chấp nhận các định dạng jpg, jpeg, png, gif.',
@@ -71,7 +71,7 @@ class CategoryControllerApi extends Controller
             'description' => $request->description,
             'slug' => $request->slug,
             'images' => $imageUrl,
-            'status_id' => $request->status_id,
+            'status' => $request->status,
             'parent_id' => $request->parent_id ?? 0,
             'created_at' => now()
         ]);
@@ -84,7 +84,7 @@ class CategoryControllerApi extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:categories,slug,' . $id,
-            'status_id' => 'required|integer',
+            'status' => 'required|integer',
             'images' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:5120',
             'parent_id' => 'nullable|integer',
         ], [
@@ -94,7 +94,7 @@ class CategoryControllerApi extends Controller
             'slug.required' => 'Slug không được để trống.',
             'slug.string' => 'Slug phải là chuỗi.',
             'slug.max' => 'Slug phải nhỏ hơn 255 ký tự.',
-            'status_id.required' => 'Trạng thái không được để trống',
+            'status.required' => 'Trạng thái không được để trống',
             'slug.unique' => 'Slug đã tồn tại.',
             'images.image' => 'File tải lên phải là hình ảnh.',
             'images.mimes' => 'Chỉ chấp nhận các định dạng jpg, jpeg, png, gif.',
@@ -121,7 +121,7 @@ class CategoryControllerApi extends Controller
             'description' => $request->description,
             'slug' => $request->slug,
             'images' => $imageUrl,
-            'status_id' => $request->status_id,
+            'status' => $request->status,
             'parent_id' => $request->parent_id ?? 0,
             'updated_at' => now()
         ]);
