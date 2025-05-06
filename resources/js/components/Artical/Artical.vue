@@ -32,6 +32,7 @@ const form = reactive({
     content: '',
     slug: '',
     status: 1,
+    is_hot: 1,
 });
 
 watch(() => form.title, (newName) => {
@@ -205,9 +206,9 @@ const submitAddForm = async () => {
         formData.append('content', form.content);
         formData.append('slug', form.slug);
         formData.append('status', form.status);
+        formData.append('is_hot', form.is_hot);
 
         const response = await axios.post('/api/artical/post-artical', formData);
-        // console.log('Category created:', response.data);
 
         // Reset form
         Object.assign(form, {
@@ -220,6 +221,7 @@ const submitAddForm = async () => {
             content: '',
             slug: '',
             status: '',
+            is_hot: '',
         });
         errors.value = {};
         // Đóng modal
@@ -386,6 +388,7 @@ const submitEditForm = async () => {
                             <th class="align-middle text-start text-uppercase text-truncate">Tiêu đề</th>
                             <th class="align-middle text-start text-uppercase text-truncate">Danh mục</th>
                             <th class="align-middle text-start text-uppercase text-truncate">Sản phẩm</th>
+                            <th class="align-middle text-start text-uppercase text-truncate">Nổi bật</th>
                             <th class="align-middle text-start text-uppercase text-truncate">Trạng thái</th>
                             <th class="align-middle text-center text-uppercase text-truncate">Hành động</th>
                         </tr>
@@ -411,7 +414,15 @@ const submitEditForm = async () => {
                             <td class="align-middle text-start">{{ artical.category_artical.name }}</td>
                             <td class="align-middle text-start">{{ artical.product?.name }}</td>
                             <td class="align-middle text-start">
-                                {{ artical.status }}
+                                {{ artical.is_hot == 1 ? 'Có' : 'Không' }}
+                            </td>
+                            <td class="align-middle text-start">
+                                <span
+                                    :class="['fs-10 badge', artical.status === 1 ? 'bg-success text-white' : 'bg-danger text-white']">
+                                    {{ artical.status === 1
+                                        ? 'Hoạt động'
+                                        : 'Không hoạt động' }}
+                                </span>
                             </td>
                             <td class="align-middle text-center">
                                 <div class="position-relative">
@@ -539,7 +550,7 @@ const submitEditForm = async () => {
                                     <div v-if="errors.image" class="text-danger mt-2 fs-9 ms-2">{{ errors.image[0] }}
                                     </div>
                                 </div>
-                                <div class="col-sm-12 col-md-12">
+                                <div class="col-sm-6 col-md-6">
                                     <div class="form-floating">
                                         <select class="form-select" v-model="form.status">
                                             <option value="1">Hoạt động</option>
@@ -548,6 +559,17 @@ const submitEditForm = async () => {
                                         <label>Trạng thái</label>
                                         <div v-if="errors.status" class="text-danger mt-2 fs-9 ms-2">{{
                                             errors.status[0] }}</div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-md-6">
+                                    <div class="form-floating">
+                                        <select class="form-select" v-model="form.is_hot">
+                                            <option value="1">Có</option>
+                                            <option value="0">Không</option>
+                                        </select>
+                                        <label>Bài viết hot</label>
+                                        <div v-if="errors.is_hot" class="text-danger mt-2 fs-9 ms-2">{{
+                                            errors.is_hot[0] }}</div>
                                     </div>
                                 </div>
 
