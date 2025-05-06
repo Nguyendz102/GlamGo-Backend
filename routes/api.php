@@ -87,7 +87,7 @@ Route::group(['prefix' => 'v1'], function () {
         Route::get("/get-products-details", [ProductsControllerMobile::class, "getProductDetails"]);
     });
     Route::group(['prefix' => 'artical'], function () {
-        // lấy danh sách  bài viết  /api/v1/artical
+        // lấy danh sách  bài viết  /api/v1/artical, truyền category_artical_id để lấy bài viết theo danh mục, truyền is_hot có value là 1 để lâý các bài viết nổi bật
         Route::get('/', [ArticalControllerMobile::class, 'index']);
         // lấy danh sách danh mục bài viết  /api/v1/artical/categories
         Route::get('/categories', [ArticalControllerMobile::class, 'categories']);
