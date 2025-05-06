@@ -70,7 +70,7 @@
                                                 </span>
                                             </router-link>
                                         </li>
-                                        <!--End Artical Category -->
+                                        <!--End Article Category -->
                                         <!-- Artical -->
                                         <li class="nav-item">
                                             <router-link class="nav-link label-1" :to="{ name: 'artical' }">
