@@ -9,6 +9,9 @@ use App\Http\Controllers\api\Mobile\ProductsControllerMobile;
 use App\Http\Controllers\api\product\ProductAttributeController;
 use App\Http\Controllers\api\product\ProductAttributeValueController;
 use App\Http\Controllers\api\Product\ProductControllerApi;
+use App\Http\Controllers\BannerControllerApi;
+use App\Http\Controllers\CouponControllerApi;
+use App\Models\BannerModel;
 use App\Models\ProductAttributeModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -72,6 +75,19 @@ Route::group(['prefix' => 'artical'], function () {
     Route::post('/update-artical/{id}', [ArticalControllerApi::class, 'update']);
 });
 
+Route::prefix("coupon")->group(function () {
+    Route::get("/", [CouponControllerApi::class, "index"]);
+    Route::post("/post-coupon", [CouponControllerApi::class, "store"]);
+    Route::put("/edit/{id}", [CouponControllerApi::class, "edit"]);
+    Route::get('/detail/{id}', [CouponControllerApi::class, 'detail']);
+});
+
+Route::prefix("banner")->group(function () {
+    Route::get("/", [BannerControllerApi::class, "index"]);
+    Route::post("/", [BannerControllerApi::class, "store"]);
+    Route::post("/{id}", [BannerControllerApi::class, "update"]);
+    Route::delete("/{id}", [BannerControllerApi::class, "delete"]);
+});
 // API client App mobile
 Route::group(['prefix' => 'v1'], function () {
     Route::group(['prefix' => 'categories'], function () {
@@ -92,4 +108,8 @@ Route::group(['prefix' => 'v1'], function () {
         // lấy danh sách danh mục bài viết  /api/v1/artical/categories
         Route::get('/categories', [ArticalControllerMobile::class, 'categories']);
     });
+
+
+    // api lấy ra các ảnh abnner 
+    Route::get('/get-banner', [BannerControllerApi::class, 'getBannerMobile']);
 });
