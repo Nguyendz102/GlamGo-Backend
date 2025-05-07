@@ -11,7 +11,7 @@ class CategoriesControllerMobile extends Controller
     public function index()
     {
         $categories = CategoriesModel::with('status')
-            ->where('status_id', 1)
+            ->where('status', 1)
             ->orderByDesc('created_at')
             ->paginate(20);
 
@@ -24,7 +24,7 @@ class CategoriesControllerMobile extends Controller
                 'images' => $category->images,
                 'parent_id' => $category->parent_id,
                 'parent_name' => optional(CategoriesModel::find($category->parent_id))->name,
-                'status_id' => $category->status_id,
+                'status' => $category->status,
             ];
         });
 
