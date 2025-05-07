@@ -17,7 +17,7 @@ class ProductsControllerMobile extends Controller
         ])->orderBy('created_at', 'desc');
         $query->where('status', 1);
         $query->whereHas('category', function ($q) {
-            $q->where('status_id', 1);
+            $q->where('status', 1);
         });
         $products = $query->paginate(20)->toArray();
         $products['message'] = 'Thành công';
@@ -33,7 +33,7 @@ class ProductsControllerMobile extends Controller
         ])->orderBy('created_at', 'desc');
         $query->where('status', 1);
         $query->whereHas('category', function ($q) {
-            $q->where('status_id', 1);
+            $q->where('status', 1);
         });
         if ($request->category_id) {
             $query->where('category_id', $request->category_id);
