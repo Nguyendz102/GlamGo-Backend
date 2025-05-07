@@ -124,14 +124,14 @@ const previewMainImage = (event) => {
 const previewRelatedImages = (event) => {
     const files = Array.from(event.target.files);
     if (files.length > 0) {
-        form.image_related = files; // Lưu mảng File objects vào form
-        // Tạo URL xem trước cho tất cả ảnh
-        previewImages.related = [];
+        // Thêm files mới vào mảng hiện có thay vì ghi đè
+        form.image_related = [...form.image_related, ...files];
+
+        // Tạo URL xem trước và thêm vào mảng preview hiện có
         files.forEach(file => {
             const reader = new FileReader();
             reader.onload = (e) => {
-                previewImages.related.push(e.target.result);
-
+                previewImages.related = [...previewImages.related, e.target.result];
             };
             reader.readAsDataURL(file);
         });
@@ -154,12 +154,23 @@ const removeEditMainImage = (event) => {
 };
 
 // Hàm xóa ảnh liên quan
+const removeRelatedImage = (index, event) => {
+    event.preventDefault();
+    previewImages.related.splice(index, 1);
+    form.image_related.splice(index, 1);
+    if (previewImages.related.length === 0) {
+        document.getElementById('relatedImageUpload').value = '';
+    }
+}
+
+
+
 // ảnh mới edit
 const removeNewRelatedImage = (index, event) => {
     event.preventDefault();
     editPreviewImages.related.splice(index, 1);
     if (previewImages.related.length === 0) {
-        document.getElementById('relatedImageUpload').value = '';
+        document.getElementById('editRelatedImageUpload').value = '';
     }
 };
 // ảnh cũ
@@ -691,7 +702,7 @@ const populateEditForm = (product) => {
                                                 class="form-control validate set-0 data-value" placeholder="Tên">
                                             <label>Tên</label>
                                             <p v-if="errors.name" class="text-danger mt-2 fs-9 ms-2">{{ errors.name[0]
-                                            }}</p>
+                                                }}</p>
                                         </div>
                                     </div>
 
@@ -701,7 +712,7 @@ const populateEditForm = (product) => {
                                                 class="form-control validate set-0 data-value" placeholder="Mã">
                                             <label>Mã</label>
                                             <p v-if="errors.code" class="text-danger mt-2 fs-9 ms-2">{{ errors.code[0]
-                                            }}</p>
+                                                }}</p>
                                         </div>
                                     </div>
                                     <div class="col-12">
@@ -712,7 +723,7 @@ const populateEditForm = (product) => {
                                             <label>Giá nhập</label>
                                             <p v-if="errors.import_price" class="text-danger mt-2 fs-9 ms-2">{{
                                                 errors.import_price[0]
-                                                }}</p>
+                                            }}</p>
                                         </div>
                                     </div>
                                     <div class="col-12">
@@ -723,7 +734,7 @@ const populateEditForm = (product) => {
                                             <label>Giá sale</label>
                                             <p v-if="errors.price_sale" class="text-danger mt-2 fs-9 ms-2">{{
                                                 errors.price_sale[0]
-                                                }}</p>
+                                            }}</p>
                                         </div>
                                     </div>
 
@@ -751,7 +762,7 @@ const populateEditForm = (product) => {
                                                 class="form-control validate set-0 data-value" placeholder="Slug">
                                             <label>Slug</label>
                                             <p v-if="errors.slug" class="text-danger mt-2 fs-9 ms-2">{{ errors.slug[0]
-                                                }}</p>
+                                            }}</p>
                                         </div>
                                     </div>
                                     <div class="col-12">
@@ -770,7 +781,7 @@ const populateEditForm = (product) => {
                                                 class="form-control set-0 validate data-value" placeholder="Giá">
                                             <label>Giá bán</label>
                                             <p v-if="errors.price" class="text-danger mt-2 fs-9 ms-2">{{ errors.price[0]
-                                            }}</p>
+                                                }}</p>
                                         </div>
                                     </div>
 
@@ -1339,11 +1350,11 @@ const populateEditForm = (product) => {
                                             <dt class="col-sm-5 text-muted">Giá bán trước</dt>
                                             <dd class="col-sm-7 fw-bold text-danger text-decoration-line-through">{{
                                                 editForm.price_sale
-                                                }}
+                                            }}
                                             </dd>
                                             <dt class="col-sm-5 text-muted">Giá bán</dt>
                                             <dd class="col-sm-7 fw-bold text-success">{{ editForm.price
-                                            }}
+                                                }}
                                             </dd>
 
                                             <dt class="col-sm-5 text-muted">Nổi bật</dt>

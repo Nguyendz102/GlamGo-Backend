@@ -19,7 +19,7 @@ const form = reactive({
     description: '',
     slug: '',
     images: '',
-    status_id: 1,
+    status: 1,
     country: '',
     parent_id: ''
 });
@@ -30,7 +30,7 @@ const editForm = reactive({
     description: '',
     slug: '',
     images: '',
-    status_id: '',
+    status: '',
     parent_id: ''
 });
 
@@ -73,7 +73,7 @@ const submitForm = async () => {
         formData.append('description', form.description);
         formData.append('slug', form.slug);
         formData.append('images', form.images);
-        formData.append('status_id', form.status_id);
+        formData.append('status', form.status);
         formData.append('parent_id', form.parent_id);
         const response = await axios.post('/api/categories/post-category', formData);
         toast.success('Thêm mới danh mục thành công!')
@@ -88,7 +88,7 @@ const submitForm = async () => {
             description: '',
             slug: '',
             images: '',
-            status_id: '',
+            status: '',
             parent_id: ''
 
         });
@@ -117,7 +117,7 @@ const submitEditForm = async () => {
         formEditData.append('description', editForm.description);
         formEditData.append('slug', editForm.slug);
         formEditData.append('images', editForm.images);
-        formEditData.append('status_id', editForm.status_id);
+        formEditData.append('status', editForm.status);
         formEditData.append('parent_id', editForm.parent_id);
         const response = await axios.post(`/api/categories/edit-category/${editForm.id}`, formEditData);
         const modal = document.getElementById('modalEditCategory');
@@ -133,7 +133,7 @@ const submitEditForm = async () => {
             description: '',
             slug: '',
             images: '',
-            status_id: '',
+            status: '',
             parent_id: ''
         });
         errors.value = {};
@@ -171,7 +171,7 @@ const populateEditForm = (category) => {
         description: category.description,
         slug: category.slug,
         images: '',
-        status_id: category.status_id,
+        status: category.status,
         parent_id: category.parent_id
     });
 };
@@ -256,8 +256,8 @@ onMounted(() => {
                             <td class="align-middle text-start">{{ category.slug }}</td>
                             <td class="align-middle text-start">
                                 <span class="fs-10 badge"
-                                    :class="category.status_id == 1 ? 'bg-success-subtle text-success-emphasis' : 'bg-danger-subtle text-danger-emphasis'">
-                                    {{ category.status_id == 1 ? 'Hoạt động' : 'Không hoạt động' }}
+                                    :class="category.status == 1 ? 'bg-success-subtle text-success-emphasis' : 'bg-danger-subtle text-danger-emphasis'">
+                                    {{ category.status == 1 ? 'Hoạt động' : 'Không hoạt động' }}
                                 </span>
                             </td>
                             <td class="align-middle text-center">
@@ -309,7 +309,7 @@ onMounted(() => {
                                     <select class="form-select" v-model="form.parent_id" name="parent_id">
                                         <option value="">Danh mục</option>
                                         <option v-for="(c, index) in categories" :key="c.id" :value="c.id">{{ c.name
-                                            }}
+                                        }}
                                         </option>
                                     </select>
                                     <label>Danh mục cha</label>
@@ -329,13 +329,13 @@ onMounted(() => {
                             </div>
                             <div class="col-sm-6 col-md-6">
                                 <div class="form-floating">
-                                    <select class="form-select" v-model="form.status_id">
+                                    <select class="form-select" v-model="form.status">
                                         <option value="1">Hoạt động</option>
                                         <option value="2">Không hoạt động</option>
                                     </select>
                                     <label>Trạng thái</label>
-                                    <div v-if="errors.status_id" class="text-danger mt-2 fs-9 ms-2">{{
-                                        errors.status_id[0] }}</div>
+                                    <div v-if="errors.status" class="text-danger mt-2 fs-9 ms-2">{{
+                                        errors.status[0] }}</div>
                                 </div>
                             </div>
                             <div class="col-sm-12 col-md-12">
@@ -403,7 +403,7 @@ onMounted(() => {
                                 <div class="form-floating">
                                     <select class="form-select" v-model="editForm.parent_id" name="parent_idEdit">
                                         <option v-for="(c, index) in categories" :key="c.id" :value="c.id">{{ c.name
-                                        }}
+                                            }}
                                         </option>
                                     </select>
                                     <label>Danh mục cha</label>
@@ -429,13 +429,13 @@ onMounted(() => {
                             </div>
                             <div class="col-sm-12 col-md-12">
                                 <div class="form-floating">
-                                    <select name="statusEdit" class="form-select" v-model="editForm.status_id">
+                                    <select name="statusEdit" class="form-select" v-model="editForm.status">
                                         <option value="1">Hoạt động</option>
                                         <option value="2">Không hoạt động</option>
                                     </select>
                                     <label>Trạng thái</label>
-                                    <div v-if="errors.status_id" class="text-danger mt-2 fs-9 ms-2">{{
-                                        errors.status_id[0] }}</div>
+                                    <div v-if="errors.status" class="text-danger mt-2 fs-9 ms-2">{{
+                                        errors.status[0] }}</div>
                                 </div>
                             </div>
                             <div class="col-sm-12 col-md-12">
