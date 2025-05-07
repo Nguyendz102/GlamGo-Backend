@@ -7,6 +7,9 @@ import ProductAttribute from "../components/Products/ListProductAttribute.vue";
 import ProductAttributeValue from "../components/Products/ListProductAttributeValue.vue";
 import ArticalCategory from "../components/Artical/Category.vue";
 import Artical from "../components/Artical/Artical.vue";
+import Coupon from "../components/Coupon/Coupon.vue";
+import CouponDetails from "../components/Coupon/Details.vue";
+import Banner from "../components/Banner.vue";
 
 const routes = [
     {
@@ -53,6 +56,21 @@ const routes = [
                 path: "artical",
                 name: "artical",
                 component: Artical,
+            },
+            {
+                path: "coupon",
+                name: "coupon",
+                component: Coupon,
+            },
+            {
+                path: "coupon/:id",
+                name: "couponDetails",
+                component: CouponDetails,
+            },
+            {
+                path: "banner",
+                name: "banner",
+                component: Banner,
             },
         ]
     },

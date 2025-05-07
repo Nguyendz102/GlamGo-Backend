@@ -131,44 +131,26 @@
                                 </div>
                             </div>
 
-                            <div class="nav-item-wrapper">
-                                <a class="nav-link label-1" href="#">
-                                    <span class="nav-link-icon"><span data-feather="toggle-right"></span></span>
-                                    <span class="nav-link-text-wrapper">
-                                        <span class="nav-link-text">Trạng thái</span>
-                                    </span>
-                                </a>
-                            </div>
-
                             <!-- parent pages-->
                             <div class="nav-item-wrapper">
-                                <a class="nav-link label-1" href="#">
+                                <router-link class="nav-link label-1" :to="{ name: 'coupon' }">
                                     <span class="nav-link-icon"><span data-feather="bookmark"></span></span>
                                     <span class="nav-link-text-wrapper">
                                         <span class="nav-link-text">Mã giảm giá</span>
                                     </span>
-                                </a>
+                                </router-link>
                             </div>
 
                             <!-- parent pages-->
                             <div class="nav-item-wrapper">
-                                <a class="nav-link label-1" href="#">
+                                <router-link class="nav-link label-1" :to="{ name: 'banner' }">
                                     <span class="nav-link-icon"><span data-feather="layout"></span></span>
                                     <span class="nav-link-text-wrapper">
                                         <span class="nav-link-text">Banner</span>
                                     </span>
-                                </a>
+                                </router-link>
                             </div>
 
-                            <!-- parent pages-->
-                            <div class="nav-item-wrapper">
-                                <a class="nav-link label-1" href="#">
-                                    <span class="nav-link-icon"><span data-feather="star"></span></span>
-                                    <span class="nav-link-text-wrapper">
-                                        <span class="nav-link-text">Ratings</span>
-                                    </span>
-                                </a>
-                            </div>
                         </li>
                     </ul>
                 </div>
