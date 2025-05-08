@@ -237,7 +237,7 @@ const submitForm = async () => {
     const btnAdd = document.querySelector('#btnAdd');
     try {
         btnLoading(btnAdd, true);
-        form.slug = slug(form.name);
+        form.slug = slug(form.slug);
         const formData = new FormData();
         // Thêm các trường dữ liệu thông thường không phải là các  trường file
         for (const key in form) {
@@ -334,7 +334,7 @@ const updateForm = async () => {
     const btnEdit = document.querySelector('#btnEdit');
     try {
         btnLoading(btnEdit, true);
-        editForm.slug = slug(editForm.name);
+        editForm.slug = slug(editForm.slug);
         const formData = new FormData();
         for (const key in editForm) {
             if (key !== 'related_images', key !== 'image') {
@@ -1305,7 +1305,7 @@ const populateEditForm = (product) => {
                                                             class="related-image-wrapper position-relative border rounded p-2 bg-white h-100">
                                                             <img :src="image.url" :alt="'Product image ' + (index + 1)"
                                                                 class="img-fluid rounded"
-                                                                style="height: 120px; width: 100%; object-fit: cover;">
+                                                                style="height: 80px; width: 100%; object-fit: cover;">
                                                             <span
                                                                 class="position-absolute top-0 end-0 bg-secondary text-white px-2 rounded">
                                                                 {{ index + 1 }}
@@ -1314,6 +1314,7 @@ const populateEditForm = (product) => {
                                                     </div>
                                                 </div>
                                             </div>
+
                                             <div v-else class="alert alert-light border">
                                                 <i class="fas fa-info-circle me-2"></i> Sản phẩm này chưa có ảnh phụ
                                             </div>

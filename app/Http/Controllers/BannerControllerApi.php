@@ -37,8 +37,8 @@ class BannerControllerApi extends Controller
         $imageUrl = null;
 
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('public/banner');
-            $imageUrl = Storage::url($imagePath);
+            $imagePath = $request->file('image')->store('banner', 'public');
+            $imageUrl = '/storage/' . $imagePath;
         }
         $query = BannerModel::create([
             'image' => $imageUrl,
@@ -73,12 +73,15 @@ class BannerControllerApi extends Controller
         $banner->updated_at = now();
 
         if ($request->hasFile('image')) {
-            if ($banner->image && file_exists(public_path($banner->image))) {
-                unlink(public_path($banner->image));
+            if ($banner->image) {
+                $oldImagePath = str_replace('/storage/', '', $banner->image);
+                Storage::disk('public')->delete($oldImagePath);
             }
-            $imagePath = $request->file('image')->store('public/banner');
-            $banner->image = Storage::url($imagePath);
+
+            $imagePath = $request->file('image')->store('banner', 'public');
+            $banner->image = '/storage/' . $imagePath;
         }
+
 
         $banner->save();
 

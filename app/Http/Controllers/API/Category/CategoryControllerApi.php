@@ -62,8 +62,8 @@ class CategoryControllerApi extends Controller
         $imageUrl = null;
 
         if ($request->hasFile('images')) {
-            $imagePath = $request->file('images')->store('public/categories');
-            $imageUrl = Storage::url($imagePath);
+            $imagePath = $request->file('images')->store('categories', 'public');
+            $imageUrl = '/storage/' . $imagePath;
         }
 
         $category = CategoriesModel::create([
@@ -109,12 +109,13 @@ class CategoryControllerApi extends Controller
 
         if ($request->hasFile('images')) {
             if ($category->images) {
-                $oldImagePath = str_replace('/storage', 'public', $category->images);
-                Storage::delete($oldImagePath);
+                $oldImagePath = str_replace('/storage/', '', $category->images);
+                Storage::disk('public')->delete($oldImagePath);
             }
-            $imagePath = $request->file('images')->store('public/categories');
-            $imageUrl = Storage::url($imagePath);
+            $imagePath = $request->file('images')->store('categories', 'public');
+            $imageUrl = '/storage/' . $imagePath;
         }
+
 
         $category->update([
             'name' => $request->name,

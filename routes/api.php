@@ -110,6 +110,6 @@ Route::group(['prefix' => 'v1'], function () {
     });
 
 
-    // api lấy ra các ảnh abnner 
+    // api lấy ra các ảnh banner api/v1/get-banner
     Route::get('/get-banner', [BannerControllerApi::class, 'getBannerMobile']);
 });
