@@ -70,12 +70,15 @@ class ProductControllerApi extends Controller
         try {
             if ($files && is_array($files)) {
                 foreach ($files as $file) {
-                    $path = $file->store('public/upload');
-                    $url = Storage::url($path);
+                    $storedPath = $file->store('image_product', 'public');
+
+                    $url = '/storage/' . $storedPath;
+
                     $dataProductImage = array_merge($dataProduct, [
                         "image" => $url,
                         "image_alt" => $url,
                     ]);
+
                     ProductImagesModel::create($dataProductImage);
                 }
             }
@@ -94,8 +97,8 @@ class ProductControllerApi extends Controller
             // Upload ảnh chính
             $imagePath = null;
             if ($request->hasFile('image')) {
-                $imagePath = $request->file('image')->store('public/products');
-                $imagePath = Storage::url($imagePath);
+                $imagePath = $request->file('image')->store('products', 'public');
+                $imageUrl = '/storage/' . $imagePath;
             }
             $requestData = $request->all();
             $data = [
@@ -111,7 +114,7 @@ class ProductControllerApi extends Controller
                 'meta_title' => $requestData['meta_title'],
                 'meta_description' => $requestData['meta_description'],
                 'hashtag' => $requestData['hashtag'],
-                'image' => $imagePath,
+                'image' => $imageUrl,
                 'image_alt' => $requestData['image_alt'],
                 'status' => $requestData['status'],
             ];
@@ -143,17 +146,23 @@ class ProductControllerApi extends Controller
             if ($request->hasFile('image')) {
                 // Xóa ảnh cũ nếu tồn tại
                 $existingProduct = ProductsModel::find($request->id);
-                if ($existingProduct && $existingProduct->image && Storage::disk('public')->exists(str_replace('/storage/', '', $existingProduct->image))) {
+                if (
+                    $existingProduct &&
+                    $existingProduct->image &&
+                    Storage::disk('public')->exists(str_replace('/storage/', '', $existingProduct->image))
+                ) {
                     Storage::disk('public')->delete(str_replace('/storage/', '', $existingProduct->image));
                 }
+
                 // Upload ảnh mới
-                $imagePath = $request->file('image')->store('public/products');
-                $imagePath = Storage::url($imagePath);
+                $imagePath = $request->file('image')->store('products', 'public');
+                $imageUrl = '/storage/' . $imagePath;
             } else {
                 // Giữ nguyên ảnh cũ nếu không có ảnh mới
                 $existingProduct = ProductsModel::find($request->id);
-                $imagePath = $existingProduct ? $existingProduct->image : null;
+                $imageUrl = $existingProduct ? $existingProduct->image : null;
             }
+
 
             $data = [
                 'category_id' => $requestData['category_id'],
@@ -168,7 +177,7 @@ class ProductControllerApi extends Controller
                 'meta_title' => $requestData['meta_title'],
                 'meta_description' => $requestData['meta_description'],
                 'hashtag' => $requestData['hashtag'],
-                'image' => $imagePath,
+                'image' => $imageUrl,
                 'image_alt' => $requestData['image_alt'],
                 'status' => $requestData['status'],
             ];
