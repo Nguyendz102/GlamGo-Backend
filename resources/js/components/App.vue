@@ -87,12 +87,12 @@
                         <li class="nav-item">
                             <!-- parent pages-->
                             <div class="nav-item-wrapper">
-                                <a class="nav-link label-1" href="#">
+                                <router-link class="nav-link label-1" :to="{ name: 'orders' }">
                                     <span class="nav-link-icon"><span data-feather="shopping-cart"></span></span>
                                     <span class="nav-link-text-wrapper">
                                         <span class="nav-link-text">Đơn hàng</span>
                                     </span>
-                                </a>
+                                </router-link>
                             </div>
 
                             <div class="nav-item">
@@ -113,18 +113,18 @@
                                         <ul class="nav collapse parent" data-bs-parent="#navbarVerticalCollapse"
                                             id="nv-trans">
                                             <div class="nav-item">
-                                                <a class="nav-link label-1" href="#">
+                                                <router-link class="nav-link label-1" :to="{ name: 'transactions' }">
                                                     <span class="nav-link-text-wrapper">
                                                         <span class="nav-link-text">Lịch sử giao dịch</span>
                                                     </span>
-                                                </a>
+                                                </router-link>
                                             </div>
                                             <div class="nav-item">
-                                                <a class="nav-link" href="#">
-                                                    <div class="d-flex align-items-center">
-                                                        <span class="nav-link-text">Lịch sử thay đổi giá</span>
-                                                    </div>
-                                                </a>
+                                                <router-link class="nav-link label-1" :to="{ name: 'history-price' }">
+                                                    <span class="nav-link-text-wrapper">
+                                                        <span class="nav-link-text">Lịch sử giao dịch</span>
+                                                    </span>
+                                                </router-link>
                                             </div>
                                         </ul>
                                     </div>

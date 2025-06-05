@@ -3,12 +3,16 @@
 use App\Http\Controllers\api\Artical\ArticalCategoryControllerApi;
 use App\Http\Controllers\api\artical\ArticalControllerApi;
 use App\Http\Controllers\Api\Category\CategoryControllerApi;
+use App\Http\Controllers\api\DashBoardControllerApi;
 use App\Http\Controllers\api\mobile\ArticalControllerMobile;
 use App\Http\Controllers\api\Mobile\CategoriesControllerMobile;
 use App\Http\Controllers\api\Mobile\ProductsControllerMobile;
+use App\Http\Controllers\API\Orders\DetailOrdersController;
+use App\Http\Controllers\api\orders\OrderControllerApi;
 use App\Http\Controllers\api\product\ProductAttributeController;
 use App\Http\Controllers\api\product\ProductAttributeValueController;
 use App\Http\Controllers\api\Product\ProductControllerApi;
+use App\Http\Controllers\API\Transactions\TransactionControllerApi;
 use App\Http\Controllers\BannerControllerApi;
 use App\Http\Controllers\CouponControllerApi;
 use App\Models\BannerModel;
@@ -30,7 +34,9 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-
+Route::prefix("dashboard")->group(function () {
+    Route::get('/', [DashBoardControllerApi::class, 'index']);
+});
 
 // API WEB quản trị
 Route::group(['prefix' => 'categories'], function () {
@@ -82,11 +88,33 @@ Route::prefix("coupon")->group(function () {
     Route::get('/detail/{id}', [CouponControllerApi::class, 'detail']);
 });
 
+Route::group(['prefix' => 'transactions'], function () {
+    Route::get('/', [TransactionControllerApi::class, 'index']);
+    Route::get('/history-price', [TransactionControllerApi::class, 'historyPrice']);
+});
+
 Route::prefix("banner")->group(function () {
     Route::get("/", [BannerControllerApi::class, "index"]);
     Route::post("/", [BannerControllerApi::class, "store"]);
     Route::post("/{id}", [BannerControllerApi::class, "update"]);
     Route::delete("/{id}", [BannerControllerApi::class, "delete"]);
+});
+
+Route::group(['prefix' => 'orders'], function () {
+    Route::get('/', [OrderControllerApi::class, 'index']);
+    Route::post('/create', [OrderControllerApi::class, 'create']);
+    Route::post('/check-data', [OrderControllerApi::class, 'checkData']);
+    Route::post('/edit/{id}', [OrderControllerApi::class, 'edit']);
+    Route::get('/detail/{id}', [DetailOrdersController::class, 'index']);
+});
+
+Route::group(['prefix' => 'categories'], function () {
+    Route::get('/', [CategoryControllerApi::class, 'index']);
+    Route::get('/detail', [CategoryControllerApi::class, 'detail']);
+    Route::post('/post-category', [CategoryControllerApi::class, 'store']);
+    Route::post('/edit-category/{id}', [CategoryControllerApi::class, 'update']);
+    //ds danh mục hoạt động
+    Route::get('/on', [CategoryControllerApi::class, 'listCategoryOn']);
 });
 // API client App mobile
 Route::group(['prefix' => 'v1'], function () {

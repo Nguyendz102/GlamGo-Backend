@@ -25,4 +25,9 @@ class CategoriesModel extends Model
     {
         return $this->children()->with('allChildrenIds')->pluck('id')->toArray();
     }
+
+    public function products()
+    {
+        return $this->hasMany(ProductsModel::class, 'category_id');
+    }
 }

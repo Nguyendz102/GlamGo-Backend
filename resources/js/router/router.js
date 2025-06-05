@@ -10,6 +10,12 @@ import Artical from "../components/Artical/Artical.vue";
 import Coupon from "../components/Coupon/Coupon.vue";
 import CouponDetails from "../components/Coupon/Details.vue";
 import Banner from "../components/Banner.vue";
+import Orders from "../components/Orders/index.vue";
+import OrderDetails from "../components/Orders/Details.vue";
+import Transactions from "../components/Transactions/Index.vue";
+import HistoryPriceProduct from "../components/Transactions/HistoryPriceProduct.vue";
+import DetailCategorys from "../components/DetailCategories.vue";
+
 
 const routes = [
     {
@@ -71,6 +77,31 @@ const routes = [
                 path: "banner",
                 name: "banner",
                 component: Banner,
+            },
+            {
+                path: "orders",
+                name: "orders",
+                component: Orders,
+            },
+            {
+                path: "orders/:id",
+                name: "ordersDetails",
+                component: OrderDetails,
+            },
+            {
+                path: "transactions",
+                name: "transactions",
+                component: Transactions,
+            },
+            {
+                path: "history-price",
+                name: "history-price",
+                component: HistoryPriceProduct,
+            },
+            {
+                path: "detail-category",
+                name: "detail-category",
+                component: DetailCategorys,
             },
         ]
     },
