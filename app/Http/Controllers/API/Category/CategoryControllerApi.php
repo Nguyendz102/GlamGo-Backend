@@ -65,8 +65,8 @@ class CategoryControllerApi extends Controller
         $imageUrl = null;
 
         if ($request->hasFile('images')) {
-            $imagePath = $request->file('images')->store('public/categories');
-            $imageUrl = Storage::url($imagePath);
+            $imagePath = $request->file('images')->store('categories');
+            $imageUrl = '/storage/' . $imagePath;
         }
 
         $category = CategoriesModel::create([
@@ -88,7 +88,6 @@ class CategoryControllerApi extends Controller
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:categories,slug,' . $id,
             'status' => 'required|integer|exists:status,id',
-            'country' => 'required|integer|exists:country,id',
             'images' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:5120',
             'parent_id' => 'nullable|integer|not_in:' . $id,
 
@@ -97,7 +96,6 @@ class CategoryControllerApi extends Controller
             'name.string' => 'Tên danh mục phải là chuỗi.',
             'name.max' => 'Tên danh mục phải nhỏ hơn 255 ký tự.',
             'slug.required' => 'Slug không được để trống.',
-            'country.required' => 'Quốc gia không được để trống.',
             'slug.string' => 'Slug phải là chuỗi.',
             'slug.max' => 'Slug phải nhỏ hơn 255 ký tự.',
             'status.required' => 'Trạng thái không được để trống',
@@ -116,13 +114,12 @@ class CategoryControllerApi extends Controller
         $imageUrl = $category->images;
 
         if ($request->hasFile('images')) {
-            // Delete old image if exists
             if ($category->images) {
-                $oldImagePath = str_replace('/storage', 'public', $category->images);
-                Storage::delete($oldImagePath);
+                $oldImagePath = ltrim(str_replace('/storage/', '', $category->images), '/');
+                Storage::disk('public')->delete($oldImagePath);
             }
-            $imagePath = $request->file('images')->store('public/categories');
-            $imageUrl = Storage::url($imagePath);
+            $imagePath = $request->file('images')->store('categories', 'public');
+            $imageUrl = '/storage/' . $imagePath;
         }
 
         $category->update([
@@ -131,7 +128,6 @@ class CategoryControllerApi extends Controller
             'slug' => $request->slug,
             'images' => $imageUrl,
             'status' => $request->status,
-            'country_id' => $request->country,
             'parent_id' => $request->parent_id ?? 0,
             'updated_at' => now()
         ]);
