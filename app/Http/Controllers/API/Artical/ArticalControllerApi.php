@@ -140,13 +140,12 @@ class ArticalControllerApi extends Controller
         $imageUrl = $artical->image;
 
         if ($request->hasFile('image')) {
-            // Delete old image if exists
-            if ($artical->image) {
-                $oldImagePath = str_replace('/storage', 'public', $artical->image);
-                Storage::delete($oldImagePath);
+            if ($artical->images) {
+                $oldImagePath = ltrim(str_replace('/storage/', '',  $artical->image), '/');
+                Storage::disk('public')->delete($oldImagePath);
             }
-            $imagePath = $request->file('image')->store('public/artical');
-            $imageUrl = Storage::url($imagePath);
+            $imagePath = $request->file('image')->store('artical', 'public');
+            $imageUrl = '/storage/' . $imagePath;
         }
         $data = $request->all();
         $data['image'] = $imageUrl;

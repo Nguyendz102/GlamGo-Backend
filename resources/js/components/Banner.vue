@@ -127,11 +127,10 @@ const submitForm = async () => {
         fetchBanner();
     } catch (error) {
         if (error.response && error.response.status === 422) {
-            errors.value = error.response.data.message;
-            // console.log(errors.value);
-
+            errors.value = error.response.data.errors; // <-- Sửa chỗ này
         } else {
-            console.error('Error creating category:', error);
+            console.error('Error creating banner:', error);
+            toast.error('Có lỗi xảy ra khi thêm banner');
         }
     }
 };
@@ -175,13 +174,13 @@ const submitEditForm = async () => {
         fetchBanner();
     } catch (error) {
         if (error.response && error.response.status === 422) {
-            errors.value = error.response.data.message;
-            // console.log(errors.value);
-
+            errors.value = error.response.data.errors; // <-- Sửa chỗ này
         } else {
-            console.error('Error creating category:', error);
+            console.error('Error updating banner:', error);
+            toast.error('Có lỗi xảy ra khi cập nhật banner');
         }
     }
+
 };
 
 </script>

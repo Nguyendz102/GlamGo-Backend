@@ -17,7 +17,6 @@ const isReadOnly = ref(false);
 const errors = ref({});
 const toast = useToast();
 // const editor = ClassicEditor;
-const statusTableName = ref('');
 const previewImages = reactive({
     image: '',
 });
@@ -699,16 +698,16 @@ const submitEditForm = async () => {
                                 <div class="col-sm-12 col-md-12">
                                     <div class="form-floating">
                                         <select class="form-select" v-model="editForm.status">
-                                            <option v-for="(status, index) in statusTableName" :key="status.id"
-                                                :value="status.id">
-                                                {{ status.name }}
-                                            </option>
+                                            <option :value="1">Hoạt động</option>
+                                            <option :value="0">Không hoạt động</option>
                                         </select>
                                         <label>Trạng thái</label>
-                                        <div v-if="errors.status" class="text-danger mt-2 fs-9 ms-2">{{
-                                            errors.status[0] }}</div>
+                                        <div v-if="errors.status" class="text-danger mt-2 fs-9 ms-2">
+                                            {{ errors.status[0] }}
+                                        </div>
                                     </div>
                                 </div>
+
 
                                 <div class="col-12 gy-6">
                                     <div class="row g-3 justify-content-center">

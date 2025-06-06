@@ -114,7 +114,6 @@ class OrderControllerApi extends Controller
         try {
 
             DB::beginTransaction();
-
             // 1. Làm sạch dữ liệu đầu vào cho coupon code
             $couponCode = trim(htmlspecialchars($request->code_discount));
             $coupon_id = CouponModel::where('code', $couponCode)->value('id');
@@ -159,9 +158,9 @@ class OrderControllerApi extends Controller
                 'transaction_id' => null,
                 'payment_method' => 1,
                 'payment_status' => 2,
+                'status' => 1,
+                "country_id" => 1,
                 'total_price' => $totalPrice,
-                'status_id' => 9,
-                "country_id" => $dataInfo['country_id'],
                 "email" => $dataInfo['email'],
                 "first_name" => $dataInfo['first_name'],
                 "last_name" => $dataInfo['last_name'],
