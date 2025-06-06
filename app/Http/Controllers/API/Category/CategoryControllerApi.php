@@ -13,7 +13,7 @@ class CategoryControllerApi extends Controller
 {
     public function index(Request $request)
     {
-        $query = CategoriesModel::with(['status'])->orderBy('created_at', 'desc');
+        $query = CategoriesModel::orderBy('created_at', 'desc');
         if ($request->has('search')) {
             $search = $request->input('search');
             $query->where('name', 'like', "%{$search}%");
@@ -27,10 +27,9 @@ class CategoryControllerApi extends Controller
                 'description' => $category->description,
                 'slug' => $category->slug,
                 'images' => $category->images,
-                'country_id' => $category->country_id,
                 'parent_id' => $category->parent_id,
                 'parent_name' => $parentCategory->name ?? null,
-                'status_id' => $category->status_id,
+                'status' => $category->status,
                 'status_name' => $category->status->name ?? null,
                 'status_color' => $category->status->color ?? null,
             ];
@@ -44,18 +43,16 @@ class CategoryControllerApi extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:categories,slug',
-            'status_id' => 'required|integer|exists:status,id',
-            'country' => 'required|string|max:255',
+            'status' => 'required|integer|exists:status,id',
             'images' => 'nullable|sometimes|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
         ], [
             'name.required' => 'Tên danh mục không được để trống.',
             'name.string' => 'Tên danh mục phải là chuỗi.',
             'name.max' => 'Tên danh mục phải nhỏ hơn 255 ký tự.',
             'slug.required' => 'Slug không được để trống.',
-            'country.required' => 'Quốc gia không được để trống.',
             'slug.string' => 'Slug phải là chuỗi.',
             'slug.max' => 'Slug phải nhỏ hơn 255 ký tự.',
-            'status_id.required' => 'Trạng thái không được để trống',
+            'status.required' => 'Trạng thái không được để trống',
             'slug.unique' => 'Slug đã tồn tại.',
             'images.image' => 'File tải lên phải là hình ảnh.',
             'images.mimes' => 'Chỉ chấp nhận các định dạng jpg, jpeg, png, gif.',
@@ -77,8 +74,7 @@ class CategoryControllerApi extends Controller
             'description' => $request->description,
             'slug' => $request->slug,
             'images' => $imageUrl,
-            'status_id' => $request->status_id,
-            'country_id' => $request->country,
+            'status' => $request->status,
             'parent_id' => $request->parent_id ?? 0,
             'created_at' => now()
         ]);
@@ -91,7 +87,7 @@ class CategoryControllerApi extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:categories,slug,' . $id,
-            'status_id' => 'required|integer|exists:status,id',
+            'status' => 'required|integer|exists:status,id',
             'country' => 'required|integer|exists:country,id',
             'images' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:5120',
             'parent_id' => 'nullable|integer|not_in:' . $id,
@@ -104,7 +100,7 @@ class CategoryControllerApi extends Controller
             'country.required' => 'Quốc gia không được để trống.',
             'slug.string' => 'Slug phải là chuỗi.',
             'slug.max' => 'Slug phải nhỏ hơn 255 ký tự.',
-            'status_id.required' => 'Trạng thái không được để trống',
+            'status.required' => 'Trạng thái không được để trống',
             'slug.unique' => 'Slug đã tồn tại.',
             'images.image' => 'File tải lên phải là hình ảnh.',
             'images.mimes' => 'Chỉ chấp nhận các định dạng jpg, jpeg, png, gif.',
@@ -134,7 +130,7 @@ class CategoryControllerApi extends Controller
             'description' => $request->description,
             'slug' => $request->slug,
             'images' => $imageUrl,
-            'status_id' => $request->status_id,
+            'status' => $request->status,
             'country_id' => $request->country,
             'parent_id' => $request->parent_id ?? 0,
             'updated_at' => now()
@@ -145,7 +141,7 @@ class CategoryControllerApi extends Controller
 
     public function listCategoryOn(Request $request)
     {
-        $categories = CategoriesModel::where('status_id', 1)->orderBy('id', 'desc')->get();
+        $categories = CategoriesModel::where('status', 1)->orderBy('id', 'desc')->get();
         return response()->json(['data' => $categories], 200);
     }
     public function detail()

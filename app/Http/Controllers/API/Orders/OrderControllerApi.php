@@ -61,8 +61,6 @@ class OrderControllerApi extends Controller
         return response()->json($result);
     }
 
-
-
     public function edit(Request $request, $id)
     {
         $order = OrderModel::find($id);
