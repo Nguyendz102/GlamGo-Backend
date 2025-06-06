@@ -104,6 +104,7 @@ Route::group(['prefix' => 'orders'], function () {
     Route::get('/', [OrderControllerApi::class, 'index']);
     Route::post('/create', [OrderControllerApi::class, 'create']);
     Route::post('/check-data', [OrderControllerApi::class, 'checkData']);
+    Route::get('/status', [OrderControllerApi::class, 'getStatusOrder']);
     Route::post('/edit/{id}', [OrderControllerApi::class, 'edit']);
     Route::get('/detail/{id}', [DetailOrdersController::class, 'index']);
 });

@@ -66,7 +66,7 @@ class OrderControllerApi extends Controller
     public function edit(Request $request, $id)
     {
         $order = OrderModel::find($id);
-        $order->update(['status_id' => $request->input('status_id')]);
+        $order->update(['status' => $request->input('status')]);
         return response()->json($order, 200);
     }
     public function checkData(Request $request)
@@ -198,6 +198,40 @@ class OrderControllerApi extends Controller
             DB::rollBack();
             return response()->json(['message' => $th->getMessage()], 500);
         }
+    }
+    public function getStatusOrder(Request $request)
+    {
+        $statuses = [
+            1 => 'Chờ kiểm tra',
+            2 => 'Đang chuẩn bị hàng',
+            3 => 'Đang giao hàng',
+            4 => 'Đã giao hàng',
+            5 => 'Đã hủy',
+        ];
+
+        $currentId = (int) $request->id;
+
+        $nextStatuses = [];
+
+        // Xác định trạng thái kế tiếp
+        if ($currentId >= 1 && $currentId <= 3) {
+            $nextId = $currentId + 1;
+
+            if (isset($statuses[$nextId])) {
+                $nextStatuses[] = [
+                    'id' => $nextId,
+                    'name' => $statuses[$nextId],
+                ];
+            }
+
+            // Trạng thái hủy luôn hiển thị nếu chưa đến bước 4
+            $nextStatuses[] = [
+                'id' => 5,
+                'name' => $statuses[5],
+            ];
+        }
+
+        return response()->json($nextStatuses);
     }
 
     // public function createTransaction(Request $request, $idOrder)
