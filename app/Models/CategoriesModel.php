@@ -11,10 +11,10 @@ class CategoriesModel extends Model
     protected $table = 'categories';
     protected $guarded = [];
 
-    // public function status()
-    // {
-    //     return $this->belongsTo(StatusModel::class, 'status_id');
-    // }
+    public function status()
+    {
+        return $this->belongsTo(StatusModel::class, 'status_id');
+    }
 
     public function children()
     {
