@@ -109,7 +109,7 @@ const submitEditForm = async () => {
     }
 };
 const openModalUpdate = async (order) => {
-    const response = await axios.get('/api/status/order', {
+    const response = await axios.get('/api/orders/status', {
         params: {
             id: order.status
         }
@@ -247,7 +247,7 @@ const resetFilters = () => {
                             <td class="align-middle text-start">{{ order.created_at }}</td>
                             <td class="align-middle text-start">
                                 <router-link :to="`/admin/orders/${order.id}`">{{ order.code
-                                    }}</router-link>
+                                }}</router-link>
                             </td>
                             <td class="align-middle text-start">{{ order.name_cus }}</td>
                             <td class="align-middle text-start">{{ order.code_coupon }}</td>
