@@ -373,6 +373,8 @@ const updateForm = async () => {
 const openModalCreate = () => {
     errors.value = {};
     form.value = {};
+    form.image_related = []
+    previewImages.related = [];
     const modal = document.getElementById('addModel');
     const initModal = new Modal(modal)
     initModal.show();
