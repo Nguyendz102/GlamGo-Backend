@@ -12,6 +12,7 @@ use App\Http\Controllers\api\orders\OrderControllerApi;
 use App\Http\Controllers\api\product\ProductAttributeController;
 use App\Http\Controllers\api\product\ProductAttributeValueController;
 use App\Http\Controllers\api\Product\ProductControllerApi;
+use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\Transactions\TransactionControllerApi;
 use App\Http\Controllers\BannerControllerApi;
 use App\Http\Controllers\CouponControllerApi;
@@ -34,6 +35,17 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::prefix('admin/auth')->group(function () {
+    Route::post('/login', [AuthController::class, 'loginAdmin']);
+    Route::post('/register', [AuthController::class, 'registerAdmin']);
+    Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+        Route::get('/me', [AuthController::class, 'me']);
+        Route::post('/logout', [AuthController::class, 'logout']);
+    });
+});
+
+Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
 Route::prefix("dashboard")->group(function () {
     Route::get('/', [DashBoardControllerApi::class, 'index']);
 });
@@ -117,8 +129,18 @@ Route::group(['prefix' => 'categories'], function () {
     //ds danh mục hoạt động
     Route::get('/on', [CategoryControllerApi::class, 'listCategoryOn']);
 });
+});
 // API client App mobile
 Route::group(['prefix' => 'v1'], function () {
+    Route::prefix('auth')->group(function () {
+        Route::post('/login', [AuthController::class, 'loginCustomer']);
+        Route::post('/register', [AuthController::class, 'registerCustomer']);
+        Route::middleware(['auth:sanctum', 'role:customer'])->group(function () {
+            Route::get('/me', [AuthController::class, 'me']);
+            Route::post('/logout', [AuthController::class, 'logout']);
+        });
+    });
+
     Route::group(['prefix' => 'categories'], function () {
         // lấy danh sách danh mục  /api/v1/categories
         Route::get('/', [CategoriesControllerMobile::class, 'index']);

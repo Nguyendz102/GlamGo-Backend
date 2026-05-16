@@ -1,5 +1,6 @@
 <template>
-    <main class="main" id="top">
+    <router-view v-if="$route.meta.public"></router-view>
+    <main v-else class="main" id="top">
         <nav class="navbar navbar-vertical navbar-expand-lg">
             <div class="collapse navbar-collapse" id="navbarVerticalCollapse">
                 <!-- scrollbar removed-->
@@ -303,7 +304,7 @@
                                             <img class="rounded-circle" src="../../assets/img/team/40x40/57.webp"
                                                 alt="" />
                                         </div>
-                                        <h6 class="mt-2 text-body-emphasis">The Nguyen</h6>
+                                        <h6 class="mt-2 text-body-emphasis">{{ authUser?.name || 'Admin' }}</h6>
                                     </div>
                                     <div class="mb-3 mx-3">
                                         <input class="form-control form-control-sm" id="statusUpdateInput" type="text"
@@ -339,7 +340,8 @@
                                     </ul>
                                     <hr />
                                     <div class="px-3"> <a class="btn btn-phoenix-secondary d-flex flex-center w-100"
-                                            href="#!"> <span class="me-2" data-feather="log-out"> </span>Sign out</a>
+                                            href="#!" @click.prevent="logout"> <span class="me-2"
+                                                data-feather="log-out"> </span>Sign out</a>
                                     </div>
                                     <div class="my-2 text-center fw-bold fs-10 text-body-quaternary"><a
                                             class="text-body-quaternary me-1" href="#!">Privacy policy</a>&bull;<a
@@ -566,3 +568,39 @@
         </div>
     </main>
 </template>
+
+<script>
+export default {
+    name: "AdminApp",
+    data() {
+        return {
+            authUser: this.getAuthUser(),
+        };
+    },
+    methods: {
+        getAuthUser() {
+            try {
+                return JSON.parse(localStorage.getItem("admin_user") || "null");
+            } catch (error) {
+                return null;
+            }
+        },
+        async logout() {
+            try {
+                await axios.post("/api/admin/auth/logout");
+            } catch (error) {
+                // Token may already be invalid; local cleanup still completes logout.
+            } finally {
+                localStorage.removeItem("admin_token");
+                localStorage.removeItem("admin_user");
+                this.$router.push({ name: "adminLogin" });
+            }
+        },
+    },
+    watch: {
+        $route() {
+            this.authUser = this.getAuthUser();
+        },
+    },
+};
+</script>

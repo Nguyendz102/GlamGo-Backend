@@ -15,16 +15,31 @@ import OrderDetails from "../components/Orders/Details.vue";
 import Transactions from "../components/Transactions/Index.vue";
 import HistoryPriceProduct from "../components/Transactions/HistoryPriceProduct.vue";
 import DetailCategorys from "../components/DetailCategories.vue";
+import Login from "../components/Auth/Login.vue";
+import Register from "../components/Auth/Register.vue";
 
 
 const routes = [
     {
+        path: "/admin/login",
+        name: "adminLogin",
+        component: Login,
+        meta: { public: true },
+    },
+    {
+        path: "/admin/register",
+        name: "adminRegister",
+        component: Register,
+        meta: { public: true },
+    },
+    {
         path: "/admin",
         component: Home,
+        meta: { requiresAuth: true },
         children: [
             {
                 path: "",
-                redirect: "admin/dashboard"
+                redirect: "/admin/dashboard"
             },
             {
                 path: "dashboard",
@@ -109,6 +124,20 @@ const routes = [
 const router = createRouter({
     history: createWebHistory(),
     routes,
+});
+
+router.beforeEach((to, from, next) => {
+    const token = localStorage.getItem("admin_token");
+
+    if (to.meta.requiresAuth && !token) {
+        return next({ name: "adminLogin" });
+    }
+
+    if ((to.name === "adminLogin" || to.name === "adminRegister") && token) {
+        return next({ name: "dashboard" });
+    }
+
+    next();
 });
 
 export default router;

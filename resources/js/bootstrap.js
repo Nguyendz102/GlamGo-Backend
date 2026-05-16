@@ -9,6 +9,32 @@ window.axios = axios;
 
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
+window.axios.interceptors.request.use((config) => {
+    const token = localStorage.getItem('admin_token');
+
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+});
+
+window.axios.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        const status = error.response?.status;
+        const currentPath = window.location.pathname;
+
+        if ((status === 401 || status === 403) && currentPath.startsWith('/admin') && !currentPath.includes('/admin/login')) {
+            localStorage.removeItem('admin_token');
+            localStorage.removeItem('admin_user');
+            window.location.href = '/admin/login';
+        }
+
+        return Promise.reject(error);
+    }
+);
+
 /**
  * Echo exposes an expressive API for subscribing to channels and listening
  * for events that are broadcast by Laravel. Echo and event broadcasting
