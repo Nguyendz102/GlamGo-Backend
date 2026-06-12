@@ -41,18 +41,31 @@ window.axios.interceptors.response.use(
  * allows your team to easily build robust real-time web applications.
  */
 
-// import Echo from 'laravel-echo';
+import Echo from 'laravel-echo';
+import Pusher from 'pusher-js';
 
-// import Pusher from 'pusher-js';
-// window.Pusher = Pusher;
+window.Pusher = Pusher;
 
-// window.Echo = new Echo({
-//     broadcaster: 'pusher',
-//     key: import.meta.env.VITE_PUSHER_APP_KEY,
-//     cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER ?? 'mt1',
-//     wsHost: import.meta.env.VITE_PUSHER_HOST ? import.meta.env.VITE_PUSHER_HOST : `ws-${import.meta.env.VITE_PUSHER_APP_CLUSTER}.pusher.com`,
-//     wsPort: import.meta.env.VITE_PUSHER_PORT ?? 80,
-//     wssPort: import.meta.env.VITE_PUSHER_PORT ?? 443,
-//     forceTLS: (import.meta.env.VITE_PUSHER_SCHEME ?? 'https') === 'https',
-//     enabledTransports: ['ws', 'wss'],
-// });
+const reverbScheme = import.meta.env.VITE_REVERB_SCHEME ?? 'http';
+
+window.Echo = new Echo({
+    broadcaster: 'pusher',
+    key: import.meta.env.VITE_REVERB_APP_KEY ?? 'glamgo-local-key',
+    cluster: import.meta.env.VITE_REVERB_APP_CLUSTER ?? 'mt1',
+    wsHost: import.meta.env.VITE_REVERB_HOST ?? window.location.hostname,
+    wsPort: Number(import.meta.env.VITE_REVERB_PORT ?? 8080),
+    wssPort: Number(import.meta.env.VITE_REVERB_PORT ?? 443),
+    forceTLS: reverbScheme === 'https',
+    disableStats: true,
+    enabledTransports: ['ws', 'wss'],
+    authorizer: (channel) => ({
+        authorize: (socketId, callback) => {
+            window.axios.post('/api/v1/broadcasting/auth', {
+                socket_id: socketId,
+                channel_name: channel.name,
+            })
+                .then((response) => callback(false, response.data))
+                .catch((error) => callback(true, error));
+        },
+    }),
+});

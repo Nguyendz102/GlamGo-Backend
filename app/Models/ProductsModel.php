@@ -35,6 +35,16 @@ class ProductsModel extends Model
         return $this->hasMany(Rating::class, 'product_id');
     }
 
+    public function variants()
+    {
+        return $this->hasMany(ProductVariantModel::class, 'product_id');
+    }
+
+    public function favorites()
+    {
+        return $this->hasMany(FavoriteProduct::class, 'product_id');
+    }
+
     public function article() {
         return $this->hasMany(ArticalModel::class, 'product_id');
     }

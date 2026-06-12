@@ -34,6 +34,31 @@ const form = reactive({
     is_hot: 1,
 });
 
+const resetAddForm = () => {
+    Object.assign(form, {
+        category_artical_id: '',
+        product_id: '',
+        title: '',
+        meta_tittle: '',
+        meta_description: '',
+        image: '',
+        content: '',
+        slug: '',
+        status: 1,
+        is_hot: 1,
+    });
+
+    const editorInstance = CKEDITOR.instances.editorContent;
+    if (editorInstance) {
+        editorInstance.setData('');
+    }
+
+    const imageInput = document.getElementById('addArticalImage');
+    if (imageInput) {
+        imageInput.value = '';
+    }
+};
+
 watch(() => form.title, (newName) => {
     form.slug = slug(newName);
 
@@ -209,19 +234,7 @@ const submitAddForm = async () => {
 
         const response = await axios.post('/api/artical/post-artical', formData);
 
-        // Reset form
-        Object.assign(form, {
-            category_artical_id: '',
-            product_id: '',
-            title: '',
-            meta_tittle: '',
-            meta_description: '',
-            image: '',
-            content: '',
-            slug: '',
-            status: '',
-            is_hot: '',
-        });
+        resetAddForm();
         errors.value = {};
         // Đóng modal
         const modal = document.getElementById('addModal');
@@ -282,6 +295,7 @@ const populateEditForm = (artical) => {
 
 const openModalCreate = () => {
     errors.value = {};
+    resetAddForm();
     const modal = document.getElementById('addModal');
     const modalCreate = new Modal(modal)
     modalCreate.show();
@@ -544,7 +558,7 @@ const submitEditForm = async () => {
                                     </div>
                                 </div>
                                 <div class="col-sm-12 col-md-12">
-                                    <input type="file" name="image" @change="handleFileChange" class="form-control"
+                                    <input type="file" id="addArticalImage" name="image" @change="handleFileChange" class="form-control"
                                         placeholder="Chọn ảnh">
                                     <div v-if="errors.image" class="text-danger mt-2 fs-9 ms-2">{{ errors.image[0] }}
                                     </div>

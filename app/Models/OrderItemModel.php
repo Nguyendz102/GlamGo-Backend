@@ -19,6 +19,10 @@ class OrderItemModel extends Model
     {
         return $this->belongsTo(ProductsModel::class, 'product_id');
     }
+    public function variant()
+    {
+        return $this->belongsTo(ProductVariantModel::class, 'product_variant_id');
+    }
     public function orderProductAttributeValueItemModel()
     {
         return $this->hasMany(OrderProductAttributeValueItemModel::class, 'order_item_id');

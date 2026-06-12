@@ -30,6 +30,21 @@ return [
 
     'connections' => [
 
+        'reverb' => [
+            'driver' => 'reverb',
+            'key' => env('REVERB_APP_KEY', 'glamgo-local-key'),
+            'secret' => env('REVERB_APP_SECRET', 'glamgo-local-secret'),
+            'app_id' => env('REVERB_APP_ID', 'glamgo-local-app'),
+            'options' => [
+                'host' => env('REVERB_HOST', '127.0.0.1'),
+                'port' => env('REVERB_PORT', 8080),
+                'scheme' => env('REVERB_SCHEME', 'http'),
+                'useTLS' => env('REVERB_SCHEME', 'http') === 'https',
+                'path' => env('REVERB_SERVER_PATH', ''),
+            ],
+            'client_options' => [],
+        ],
+
         'pusher' => [
             'driver' => 'pusher',
             'key' => env('PUSHER_APP_KEY'),

@@ -96,6 +96,24 @@
                                 </router-link>
                             </div>
 
+                            <div class="nav-item-wrapper">
+                                <router-link class="nav-link label-1" :to="{ name: 'chat' }">
+                                    <span class="nav-link-icon"><span data-feather="message-circle"></span></span>
+                                    <span class="nav-link-text-wrapper">
+                                        <span class="nav-link-text">Tin nhắn</span>
+                                    </span>
+                                </router-link>
+                            </div>
+
+                            <div class="nav-item-wrapper">
+                                <router-link class="nav-link label-1" :to="{ name: 'customers' }">
+                                    <span class="nav-link-icon"><span data-feather="users"></span></span>
+                                    <span class="nav-link-text-wrapper">
+                                        <span class="nav-link-text">Khách hàng</span>
+                                    </span>
+                                </router-link>
+                            </div>
+
                             <div class="nav-item">
                                 <!-- parent pages-->
                                 <i class="fa-thin fa-file-lines"></i>

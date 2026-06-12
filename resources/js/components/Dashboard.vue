@@ -22,7 +22,7 @@
             </div>
             <router-link to="orders" class="body text-decoration-none">
                 <p class="fw-bold m-0"><span class="thongke-khongkhoa">{{ formatNumber(dataDashboard.order_price)
-                }}</span> doanh thu
+                }}</span> doanh thu thực nhận
                 </p>
                 <span class="fs-8 fw-bold text-body-highlight">Tổng số</span>
             </router-link>
@@ -91,8 +91,8 @@
                 }
             }" class="body text-decoration-none">
                 <p class="fw-bold m-0"><span class="thongke-khongkhoa">{{
-                    formatNumber(dataDashboard.countPriceOrderMonth)
-                        }}</span> doanh thu</p>
+                    formatNumber(dataDashboard.order_price_month)
+                        }}</span> doanh thu thực nhận</p>
                 <span class="fs-8 fw-bold text-body-highlight">Tháng này</span>
             </router-link>
         </div>
@@ -138,12 +138,12 @@
                     <div class="card-body">
                         <div class="row flex-between-center mb-4 g-3">
                             <div class="col-9 md-9">
-                                <h4>Biểu đồ phát sinh doanh thu</h4>
+                                <h4>Biểu đồ phát sinh doanh thu thực nhận</h4>
                                 <p class="text-body-tertiary lh-sm mb-2">Tháng này ({{ dateNow }})</p>
                             </div>
                             <div class="col-3 md-3 d-flex justify-content-end">
                                 <router-link class="nav-link label-1" :to="{
-                                    name: 'transactions',
+                                    name: 'orders',
                                     query: {
                                         start_date: startDate,
                                         end_date: endDate
@@ -228,7 +228,7 @@ const fetchData = async () => {
             days: days.value,
             series: [
                 {
-                    name: 'tổng',
+                    name: 'Doanh thu thực nhận',
                     data: dataRevenueChar.value,
                     color: 'success',
                     areaStyle: true,

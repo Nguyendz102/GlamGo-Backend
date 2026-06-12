@@ -115,6 +115,11 @@ const openModalUpdate = async (order) => {
         }
     });
     statusOrder.value = response.data;
+    if (statusOrder.value.length === 0) {
+        toast.warning('Không có trạng thái để cập nhật.');
+        return;
+    }
+
     populateEditForm(order);
     const modal = document.getElementById('modalEditOrder');
     const editModel = new Modal(modal);
@@ -123,7 +128,7 @@ const openModalUpdate = async (order) => {
 const populateEditForm = (order) => {
     Object.assign(editForm, {
         id: order.id,
-        status: statusOrder.value[0].id,
+        status: statusOrder.value[0]?.id || '',
     });
 };
 const resetFilters = () => {
@@ -134,7 +139,9 @@ const resetFilters = () => {
 <template>
     <nav class="mb-2" aria-label="breadcrumb">
         <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="/dashboard">Trang chủ</a></li>
+            <li class="breadcrumb-item">
+                <router-link :to="{ name: 'dashboard' }">Trang chủ</router-link>
+            </li>
             <li class="breadcrumb-item">Danh sách đơn hàng</li>
         </ol>
     </nav>
@@ -158,8 +165,8 @@ const resetFilters = () => {
                 </div>
             </div>
             <div class="body text-decoration-none">
-                <p class="fw-bold m-0"><span>{{ formatNumber(total_sum) }}</span> Doanh thu</p>
-                <span class="fs-8 fw-bold text-body-highlight">Tổng số</span>
+                <p class="fw-bold m-0"><span>{{ formatNumber(total_sum) }}</span> VND</p>
+                <span class="fs-8 fw-bold text-body-highlight">Tổng giá trị đơn</span>
             </div>
         </div>
         <div>
@@ -172,7 +179,7 @@ const resetFilters = () => {
                 <p class="fw-bold m-0"><span class="thongke-khongkhoa">{{ formatNumber(total_price_du_tinh) }}</span>
                     VND
                 </p>
-                <span class="fs-8 fw-bold text-body-highlight">Tổng số Doanh thu dự tính</span>
+                <span class="fs-8 fw-bold text-body-highlight">Doanh thu dự tính</span>
             </div>
         </div>
         <div>
@@ -183,7 +190,7 @@ const resetFilters = () => {
             </div>
             <div class="body text-decoration-none">
                 <p class="fw-bold m-0"><span>{{ formatNumber(total_price_thuc_te) }}</span> VND</p>
-                <span class="fs-8 fw-bold text-body-highlight">Tổng số doanh thu thực nhận</span>
+                <span class="fs-8 fw-bold text-body-highlight">Doanh thu thực nhận</span>
             </div>
         </div>
 
@@ -269,7 +276,8 @@ const resetFilters = () => {
                             <td class="align-middle text-center">
                                 <div class="position-relative">
                                     <button class="btn btn-edit-show btn-sm btn-phoenix-secondary text-info me-1 fs-10"
-                                        @click="openModalUpdate(order)" type="button">
+                                        @click="openModalUpdate(order)" type="button"
+                                        title="Cập nhật trạng thái đơn hàng">
                                         <span class="fas far fa-edit"></span>
                                     </button>
                                 </div>

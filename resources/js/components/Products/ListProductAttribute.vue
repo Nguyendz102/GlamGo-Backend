@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useRoute } from 'vue-router';
 import { useToast } from 'vue-toastification';
 import { Modal } from 'bootstrap';
-import { formatBalance } from '../../utils';
+import { formatBalance, formatNumber } from '../../utils';
 import Pagination from '../Pagination.vue';
 
 const products = ref([]);
@@ -18,6 +18,17 @@ const productId = route.params.id;
 const productName = route.params.name;
 const showPriceInput = ref(false);
 const sign = ref('')
+const variants = ref([]);
+const variantAttributes = ref([]);
+const variantLoading = ref(false);
+const variantForm = reactive({
+    id: '',
+    sku: '',
+    price: '',
+    quantity: 0,
+    status: 1,
+    attribute_values: {},
+});
 const form = reactive({
     name: '',
     price: '',
@@ -58,8 +69,117 @@ const fetchProductAttribute = async (page = 1) => {
 };
 
 // // Gọi API khi component mounted
+const fetchVariants = async () => {
+    try {
+        variantLoading.value = true;
+        const detailResponse = await axios.get('/api/v1/products/get-products-details', {
+            params: {
+                id: productId,
+            }
+        });
+        variantAttributes.value = detailResponse.data.data?.attribute || [];
+
+        const variantsResponse = await axios.get(`/api/products/${productId}/variants`);
+        variants.value = variantsResponse.data.data || [];
+    } catch (error) {
+        console.error('Error fetching product variants:', error);
+        toast.error('Có lỗi xảy ra khi tải biến thể!');
+    } finally {
+        variantLoading.value = false;
+    }
+};
+
+const resetVariantForm = () => {
+    Object.assign(variantForm, {
+        id: '',
+        sku: '',
+        price: '',
+        quantity: 0,
+        status: 1,
+        attribute_values: {},
+    });
+};
+
+const variantAttributeIds = () => {
+    return Object.values(variantForm.attribute_values)
+        .map((value) => Number(value))
+        .filter((value) => value > 0);
+};
+
+const submitVariantForm = async () => {
+    const attributeIds = variantAttributeIds();
+
+    if (attributeIds.length !== variantAttributes.value.length) {
+        toast.warning('Vui lòng chọn đủ thuộc tính cho biến thể.');
+        return;
+    }
+
+    try {
+        const data = {
+            sku: variantForm.sku,
+            price: variantForm.price ? String(variantForm.price).replaceAll(',', '').replaceAll('.', '') : null,
+            quantity: variantForm.quantity,
+            status: variantForm.status,
+            attribute_ids: attributeIds,
+        };
+
+        if (variantForm.id) {
+            await axios.put(`/api/products/${productId}/variants/${variantForm.id}`, data);
+            toast.success('Cập nhật biến thể thành công!');
+        } else {
+            await axios.post(`/api/products/${productId}/variants`, data);
+            toast.success('Thêm biến thể thành công!');
+        }
+
+        resetVariantForm();
+        fetchVariants();
+    } catch (error) {
+        toast.error(error.response?.data?.message || 'Không thể lưu biến thể.');
+    }
+};
+
+const editVariant = (variant) => {
+    const attributeValues = {};
+    (variant.attributes || []).forEach((attribute) => {
+        attributeValues[attribute.attribute_id] = attribute.attribute_value_id;
+    });
+
+    Object.assign(variantForm, {
+        id: variant.id,
+        sku: variant.sku || '',
+        price: variant.price || '',
+        quantity: variant.quantity || 0,
+        status: variant.status,
+        attribute_values: attributeValues,
+    });
+};
+
+const deleteVariant = async (variant) => {
+    if (!confirm('Bạn có chắc chắn muốn xóa biến thể này không?')) {
+        return;
+    }
+
+    try {
+        await axios.delete(`/api/products/${productId}/variants/${variant.id}`);
+        toast.success('Xóa biến thể thành công!');
+        if (variantForm.id === variant.id) {
+            resetVariantForm();
+        }
+        fetchVariants();
+    } catch (error) {
+        toast.error(error.response?.data?.message || 'Không thể xóa biến thể.');
+    }
+};
+
+const variantName = (variant) => {
+    return (variant.attributes || [])
+        .map((attribute) => `${attribute.attribute_name}: ${attribute.attribute_value}`)
+        .join(' / ');
+};
+
 onMounted(() => {
     fetchProductAttribute();
+    fetchVariants();
 });
 
 
@@ -252,6 +372,112 @@ const submitEditForm = async () => {
             </div>
             <!-- Truyền response sang Pagination -->
             <Pagination v-if="dataPanigate" :response="dataPanigate" @getData="fetchProductAttribute" />
+        </div>
+
+        <div class="mx-n4 mx-lg-n6 px-4 px-lg-6 mb-9 bg-body-emphasis mt-4 position-relative top-1">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                <div>
+                    <h4 class="mb-1">Biến thể tồn kho</h4>
+                    <p class="text-body-secondary mb-0 fs-9">
+                        Tạo tồn kho theo tổ hợp thuộc tính, ví dụ Đen / XL.
+                    </p>
+                </div>
+                <button type="button" class="btn btn-sm btn-phoenix-secondary" @click="resetVariantForm">
+                    Làm mới form
+                </button>
+            </div>
+
+            <form class="row g-3 align-items-end mb-4" @submit.prevent="submitVariantForm">
+                <div v-for="attribute in variantAttributes" :key="attribute.id" class="col-12 col-md-3">
+                    <label class="form-label">{{ attribute.name }}</label>
+                    <select class="form-select" v-model="variantForm.attribute_values[attribute.id]">
+                        <option value="">Chọn {{ attribute.name }}</option>
+                        <option v-for="value in attribute.attribute_value" :key="value.id" :value="value.id">
+                            {{ value.name }}
+                        </option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-2">
+                    <label class="form-label">SKU</label>
+                    <input v-model="variantForm.sku" type="text" class="form-control" placeholder="SM-DEN-XL">
+                </div>
+                <div class="col-12 col-md-2">
+                    <label class="form-label">Giá riêng</label>
+                    <input v-model="variantForm.price" type="text" class="form-control"
+                        @input="variantForm.price = formatBalance($event.target.value)" placeholder="Bỏ trống nếu dùng giá SP">
+                </div>
+                <div class="col-12 col-md-2">
+                    <label class="form-label">Số lượng</label>
+                    <input v-model="variantForm.quantity" type="number" min="0" class="form-control">
+                </div>
+                <div class="col-12 col-md-2">
+                    <label class="form-label">Trạng thái</label>
+                    <select v-model="variantForm.status" class="form-select">
+                        <option :value="1">Đang bán</option>
+                        <option :value="0">Tạm ngưng</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-auto">
+                    <button type="submit" class="btn btn-primary">
+                        {{ variantForm.id ? 'Cập nhật biến thể' : 'Thêm biến thể' }}
+                    </button>
+                </div>
+            </form>
+
+            <div class="table-responsive scrollbar">
+                <table class="table table-hover table-sm fs-9 mb-0">
+                    <thead>
+                        <tr>
+                            <th class="text-uppercase text-start">Biến thể</th>
+                            <th class="text-uppercase text-start">SKU</th>
+                            <th class="text-uppercase text-end">Giá riêng</th>
+                            <th class="text-uppercase text-end">Số lượng</th>
+                            <th class="text-uppercase text-center">Trạng thái</th>
+                            <th class="text-uppercase text-center">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody v-if="variantLoading">
+                        <tr>
+                            <td colspan="6" class="text-center">
+                                <div class="spinner-border text-info spinner-border-sm" role="status"></div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody v-else-if="variants.length > 0">
+                        <tr v-for="variant in variants" :key="variant.id">
+                            <td class="align-middle text-start">{{ variantName(variant) }}</td>
+                            <td class="align-middle text-start">{{ variant.sku || '-' }}</td>
+                            <td class="align-middle text-end">
+                                {{ variant.price ? formatNumber(variant.price) : 'Theo giá sản phẩm' }}
+                            </td>
+                            <td class="align-middle text-end">{{ variant.quantity }}</td>
+                            <td class="align-middle text-center">
+                                <span class="badge"
+                                    :class="variant.status == 1 ? 'bg-success-subtle text-success-emphasis' : 'bg-danger-subtle text-danger-emphasis'">
+                                    {{ variant.status == 1 ? 'Đang bán' : 'Tạm ngưng' }}
+                                </span>
+                            </td>
+                            <td class="align-middle text-center">
+                                <button type="button" class="btn btn-sm btn-phoenix-secondary text-info me-1"
+                                    @click="editVariant(variant)">
+                                    <span class="fas fa-edit"></span>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-phoenix-secondary text-danger"
+                                    @click="deleteVariant(variant)">
+                                    <span class="fas fa-trash"></span>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody v-else>
+                        <tr>
+                            <td colspan="6" class="text-center fw-bold fs-7 text-danger">
+                                Chưa có biến thể tồn kho
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- thêm mới thuộc tính-->

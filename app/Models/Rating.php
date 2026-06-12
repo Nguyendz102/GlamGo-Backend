@@ -4,15 +4,31 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Sanctum\HasApiTokens;
 
 class Rating extends Model
 {
-    use HasFactory, HasApiTokens;
-    protected $fillable = ['id', 'product_id', 'fullname', 'phone', 'status_id', 'is_introduce', 'comment', 'image_real', 'country_id', 'rating_value', 'sessionId'];
+    use HasFactory;
+
+    protected $table = 'ratings';
+
+    protected $fillable = [
+        'product_id',
+        'fullname',
+        'phone',
+        'status_id',
+        'is_introduce',
+        'comment',
+        'image_real',
+        'country_id',
+        'user_id',
+        'rating_value',
+        'sessionId',
+    ];
 
     protected $casts = [
-        'image_real' => 'array'
+        'image_real' => 'array',
+        'is_introduce' => 'boolean',
+        'rating_value' => 'integer',
     ];
 
     public function product()

@@ -13,10 +13,16 @@ class User extends Authenticatable
 
     public const ROLE_ADMIN = 'admin';
     public const ROLE_CUSTOMER = 'customer';
+    public const IS_ADMIN = 1;
+    public const IS_CUSTOMER = 0;
 
     protected $table = 'users';
 
     protected $guarded = [];
+
+    protected $appends = [
+        'role',
+    ];
 
     protected $hidden = [
         'password',
@@ -24,17 +30,33 @@ class User extends Authenticatable
     ];
 
     protected $casts = [
-        'email_verified_at' => 'datetime',
+        'is_admin' => 'integer',
+        'wallet_balance' => 'decimal:2',
         'password' => 'hashed',
     ];
 
+    public function getRoleAttribute(): string
+    {
+        return (int) $this->is_admin === self::IS_ADMIN ? self::ROLE_ADMIN : self::ROLE_CUSTOMER;
+    }
+
     public function isAdmin(): bool
     {
-        return $this->role === self::ROLE_ADMIN;
+        return (int) $this->is_admin === self::IS_ADMIN;
     }
 
     public function isCustomer(): bool
     {
-        return $this->role === self::ROLE_CUSTOMER;
+        return (int) $this->is_admin === self::IS_CUSTOMER;
+    }
+
+    public function addresses()
+    {
+        return $this->hasMany(UserAddress::class, 'user_id');
+    }
+
+    public function favoriteProducts()
+    {
+        return $this->hasMany(FavoriteProduct::class, 'user_id');
     }
 }

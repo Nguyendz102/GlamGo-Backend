@@ -10,7 +10,14 @@ class CheckRole
 {
     public function handle(Request $request, Closure $next, string $role): Response
     {
-        if (! $request->user() || $request->user()->role !== $role) {
+        $user = $request->user();
+        $isAllowed = match ($role) {
+            'admin' => $user?->isAdmin(),
+            'customer' => $user?->isCustomer(),
+            default => false,
+        };
+
+        if (! $isAllowed) {
             return response()->json([
                 'status' => 403,
                 'message' => 'Ban khong co quyen truy cap.',

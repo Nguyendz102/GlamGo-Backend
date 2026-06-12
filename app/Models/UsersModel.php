@@ -9,5 +9,10 @@ class UsersModel extends Model
 {
     use HasFactory;
     protected $table = 'users';
-    protected $guarded = []; 
+    protected $guarded = [];
+
+    public function addresses()
+    {
+        return $this->hasMany(UserAddress::class, 'user_id');
+    }
 }

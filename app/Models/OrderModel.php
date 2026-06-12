@@ -27,6 +27,10 @@ class OrderModel extends Model
     {
         return $this->hasMany(OrderItemModel::class, 'order_id');
     }
+    public function items()
+    {
+        return $this->hasMany(OrderItemModel::class, 'order_id');
+    }
     public function country()
     {
         return $this->belongsTo(CountryModel::class, 'country_id');

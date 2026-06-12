@@ -8,8 +8,13 @@ use App\Models\CouponModel;
 use App\Models\OrderItemModel;
 use App\Models\OrderModel;
 use App\Models\OrderProductAttributeValueItemModel;
+use App\Models\ProductVariantModel;
 use App\Models\ProductsModel;
 use App\Models\TransactionsModel;
+use App\Models\User;
+use App\Notifications\OrderStatusChangedNotification;
+use App\Services\ChatBotService;
+use App\Services\OneSignalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -33,8 +38,8 @@ class OrderControllerApi extends Controller
             $query->whereBetween('created_at', [$startDate, $endDate]);
         }
 
-        $totalSum = $query->sum('total_price');
-        $total_price_du_tinh = (clone $query)->where('status', '!=', 4)->sum('total_price');
+        $totalSum = (clone $query)->sum('total_price');
+        $total_price_du_tinh = (clone $query)->whereIn('status', [1, 2, 3, 4])->sum('total_price');
         $total_price_thuc_te = (clone $query)->where('status', 4)->sum('total_price');
 
         $orders = $query->paginate(50);
@@ -63,9 +68,154 @@ class OrderControllerApi extends Controller
 
     public function edit(Request $request, $id)
     {
-        $order = OrderModel::find($id);
-        $order->update(['status' => $request->input('status')]);
-        return response()->json($order, 200);
+        $validator = Validator::make($request->all(), [
+            'status' => 'sometimes|required|integer|in:1,2,3,4,5',
+            'payment_status' => 'sometimes|required|integer|in:0,1,2',
+        ], [
+            'status.in' => 'Trạng thái đơn hàng không hợp lệ.',
+            'payment_status.in' => 'Trạng thái thanh toán không hợp lệ.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Dữ liệu không hợp lệ!',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $order = OrderModel::findOrFail($id);
+        $oldStatus = (int) $order->status;
+        $data = $validator->validated();
+        $updates = [];
+        $newStatus = $oldStatus;
+
+        if (array_key_exists('status', $data)) {
+            $newStatus = (int) $data['status'];
+            $updates['status'] = $newStatus;
+        }
+
+        if (array_key_exists('payment_status', $data)) {
+            $updates['payment_status'] = (int) $data['payment_status'];
+        }
+
+        if ($updates === []) {
+            return response()->json([
+                'message' => 'Không có dữ liệu cần cập nhật.',
+            ], 422);
+        }
+
+        DB::transaction(function () use ($order, $updates, $oldStatus, $newStatus) {
+            if (array_key_exists('status', $updates)) {
+                $this->syncVariantStockForStatusChange($order, $oldStatus, $newStatus);
+            }
+
+            $order->update($updates);
+        });
+
+        if ($oldStatus !== $newStatus) {
+            $this->sendOrderStatusChatMessage($order, $newStatus);
+        }
+
+        return response()->json($order->fresh(), 200);
+    }
+
+    private function syncVariantStockForStatusChange(OrderModel $order, int $oldStatus, int $newStatus): void
+    {
+        if ($oldStatus === $newStatus) {
+            return;
+        }
+
+        if ($newStatus === 5 && $oldStatus !== 5) {
+            $this->restoreOrderVariantStock($order);
+            return;
+        }
+
+        if ($oldStatus === 5 && $newStatus !== 5) {
+            $this->deductOrderVariantStock($order);
+        }
+    }
+
+    private function restoreOrderVariantStock(OrderModel $order): void
+    {
+        $order->loadMissing('items');
+
+        foreach ($order->items as $item) {
+            if ($item->product_variant_id) {
+                ProductVariantModel::whereKey($item->product_variant_id)
+                    ->lockForUpdate()
+                    ->increment('quantity', (int) $item->quantity);
+            }
+        }
+    }
+
+    private function deductOrderVariantStock(OrderModel $order): void
+    {
+        $order->loadMissing('items');
+
+        foreach ($order->items as $item) {
+            if (! $item->product_variant_id) {
+                continue;
+            }
+
+            $variant = ProductVariantModel::whereKey($item->product_variant_id)
+                ->lockForUpdate()
+                ->first();
+
+            if (! $variant || (int) $variant->quantity < (int) $item->quantity) {
+                abort(response()->json([
+                    'message' => 'So luong ton kho khong du de khoi phuc don hang.',
+                    'errors' => [
+                        'status' => ['So luong ton kho khong du de khoi phuc don hang.'],
+                    ],
+                ], 422));
+            }
+
+            $variant->decrement('quantity', (int) $item->quantity);
+        }
+    }
+
+    private function sendOrderStatusChatMessage(OrderModel $order, int $status): void
+    {
+        if (! $order->user_id) {
+            return;
+        }
+
+        $customer = User::whereKey($order->user_id)
+            ->where('is_admin', User::IS_CUSTOMER)
+            ->first();
+
+        if (! $customer) {
+            return;
+        }
+
+        $statusText = $this->orderStatusText($status);
+        $customer->notify(new OrderStatusChangedNotification($order, $status, $statusText));
+        $message = "Don hang {$order->code} da chuyen sang trang thai: {$statusText}.";
+
+        app(OneSignalService::class)->sendToUser($customer, 'Cap nhat trang thai don hang', $message, [
+            'type' => 'order_status_changed',
+            'order_id' => $order->id,
+            'order_code' => $order->code,
+            'status' => $status,
+            'status_text' => $statusText,
+        ]);
+
+        app(ChatBotService::class)->sendSystemMessage(
+            $customer,
+            $message
+        );
+    }
+
+    private function orderStatusText(int $status): string
+    {
+        return match ($status) {
+            1 => 'Cho kiem tra',
+            2 => 'Dang chuan bi hang',
+            3 => 'Dang giao hang',
+            4 => 'Da giao hang',
+            5 => 'Da huy',
+            default => 'Khong xac dinh',
+        };
     }
     public function checkData(Request $request)
     {
@@ -226,6 +376,17 @@ class OrderControllerApi extends Controller
                 'id' => 5,
                 'name' => $statuses[5],
             ];
+        } else {
+            foreach ($statuses as $id => $name) {
+                if ($id === $currentId) {
+                    continue;
+                }
+
+                $nextStatuses[] = [
+                    'id' => $id,
+                    'name' => $name,
+                ];
+            }
         }
 
         return response()->json($nextStatuses);

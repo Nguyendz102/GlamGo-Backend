@@ -9,8 +9,15 @@ class OrderProductAttributeValueItemModel extends Model
 {
     use HasFactory;
     protected $table = 'order_product_attribute_values_item';
-    protected $guarded = []; 
-    public function attributeValue(){
-        return $this->belongsTo(ProductAttributeValuesModel::class, 'product_attribute_value_id','id');
+    protected $guarded = [];
+
+    public function orderItem()
+    {
+        return $this->belongsTo(OrderItemModel::class, 'order_item_id');
+    }
+
+    public function attributeValue()
+    {
+        return $this->belongsTo(ProductAttributeValuesModel::class, 'product_attribute_value_id', 'id');
     }
 }

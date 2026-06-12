@@ -5,14 +5,25 @@ use App\Http\Controllers\api\artical\ArticalControllerApi;
 use App\Http\Controllers\Api\Category\CategoryControllerApi;
 use App\Http\Controllers\api\DashBoardControllerApi;
 use App\Http\Controllers\api\mobile\ArticalControllerMobile;
+use App\Http\Controllers\API\Mobile\CartControllerMobile;
 use App\Http\Controllers\api\Mobile\CategoriesControllerMobile;
+use App\Http\Controllers\API\Mobile\CouponControllerMobile;
+use App\Http\Controllers\API\Mobile\FavoriteProductControllerMobile;
+use App\Http\Controllers\API\Mobile\NotificationControllerMobile;
+use App\Http\Controllers\API\Mobile\OrderControllerMobile;
+use App\Http\Controllers\API\Mobile\ProductRatingControllerMobile;
+use App\Http\Controllers\API\Mobile\UserAddressControllerMobile;
+use App\Http\Controllers\API\Mobile\VnpayPaymentControllerMobile;
 use App\Http\Controllers\api\Mobile\ProductsControllerMobile;
 use App\Http\Controllers\API\Orders\DetailOrdersController;
 use App\Http\Controllers\api\orders\OrderControllerApi;
 use App\Http\Controllers\api\product\ProductAttributeController;
 use App\Http\Controllers\api\product\ProductAttributeValueController;
 use App\Http\Controllers\api\Product\ProductControllerApi;
+use App\Http\Controllers\API\Product\ProductVariantController;
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\ChatController;
+use App\Http\Controllers\API\CustomerControllerApi;
 use App\Http\Controllers\API\Transactions\TransactionControllerApi;
 use App\Http\Controllers\BannerControllerApi;
 use App\Http\Controllers\CouponControllerApi;
@@ -46,6 +57,20 @@ Route::prefix('admin/auth')->group(function () {
 });
 
 Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+Route::prefix("customers")->group(function () {
+    Route::get("/", [CustomerControllerApi::class, "index"]);
+    Route::get("/{id}", [CustomerControllerApi::class, "show"]);
+    Route::patch("/{id}/status", [CustomerControllerApi::class, "updateStatus"]);
+});
+
+Route::prefix("chat")->group(function () {
+    Route::get("/conversations", [ChatController::class, "adminConversations"]);
+    Route::get("/customers/{customer}/messages", [ChatController::class, "adminMessages"]);
+    Route::post("/customers/{customer}/messages", [ChatController::class, "adminSend"]);
+    Route::post("/customers/{customer}/take-over", [ChatController::class, "adminTakeOver"]);
+    Route::post("/customers/{customer}/release-to-bot", [ChatController::class, "adminReleaseToBot"]);
+});
+
 Route::prefix("dashboard")->group(function () {
     Route::get('/', [DashBoardControllerApi::class, 'index']);
 });
@@ -61,6 +86,10 @@ Route::prefix("products")->group(function () {
     Route::post("/", [ProductControllerApi::class, "store"]);
     Route::post("/{id}", [ProductControllerApi::class, "update"]);
     Route::delete("/{id}", [ProductControllerApi::class, "destroy"]);
+    Route::get("/{id}/variants", [ProductVariantController::class, "index"]);
+    Route::post("/{id}/variants", [ProductVariantController::class, "store"]);
+    Route::put("/{id}/variants/{variantId}", [ProductVariantController::class, "update"]);
+    Route::delete("/{id}/variants/{variantId}", [ProductVariantController::class, "destroy"]);
 });
 Route::prefix("product-attribute")->group(function () {
     Route::get("/{id}", [ProductAttributeController::class, "index"]);
@@ -98,6 +127,8 @@ Route::prefix("coupon")->group(function () {
     Route::post("/post-coupon", [CouponControllerApi::class, "store"]);
     Route::put("/edit/{id}", [CouponControllerApi::class, "edit"]);
     Route::get('/detail/{id}', [CouponControllerApi::class, 'detail']);
+    Route::post('/discount', [CouponControllerApi::class, 'getDiscount']);
+    Route::delete('/{id}', [CouponControllerApi::class, 'destroy']);
 });
 
 Route::group(['prefix' => 'transactions'], function () {
@@ -132,12 +163,68 @@ Route::group(['prefix' => 'categories'], function () {
 });
 // API client App mobile
 Route::group(['prefix' => 'v1'], function () {
+    Route::prefix('payments/vnpay')->group(function () {
+        Route::get('/return', [VnpayPaymentControllerMobile::class, 'return']);
+        Route::get('/ipn', [VnpayPaymentControllerMobile::class, 'ipn']);
+    });
+
     Route::prefix('auth')->group(function () {
         Route::post('/login', [AuthController::class, 'loginCustomer']);
         Route::post('/register', [AuthController::class, 'registerCustomer']);
         Route::middleware(['auth:sanctum', 'role:customer'])->group(function () {
             Route::get('/me', [AuthController::class, 'me']);
+            Route::post('/profile', [AuthController::class, 'updateProfile']);
+            Route::post('/wallet/top-up', [AuthController::class, 'topUpWallet']);
+            Route::post('/push-subscription', [AuthController::class, 'syncPushSubscription']);
             Route::post('/logout', [AuthController::class, 'logout']);
+        });
+    });
+
+    Route::middleware(['auth:sanctum', 'role:customer'])->group(function () {
+        Route::prefix('chat')->group(function () {
+            Route::get('/messages', [ChatController::class, 'customerMessages']);
+            Route::post('/messages', [ChatController::class, 'customerSend']);
+        });
+
+        Route::prefix('cart')->group(function () {
+            Route::get('/', [CartControllerMobile::class, 'index']);
+            Route::post('/items', [CartControllerMobile::class, 'store']);
+            Route::put('/items/{id}', [CartControllerMobile::class, 'update']);
+            Route::delete('/items/{id}', [CartControllerMobile::class, 'destroy']);
+            Route::delete('/clear', [CartControllerMobile::class, 'clear']);
+        });
+
+        Route::prefix('orders')->group(function () {
+            Route::get('/', [OrderControllerMobile::class, 'index']);
+            Route::post('/checkout', [OrderControllerMobile::class, 'checkout']);
+            Route::get('/{id}', [OrderControllerMobile::class, 'show']);
+            Route::post('/{id}/cancel', [OrderControllerMobile::class, 'cancel']);
+        });
+
+        Route::prefix('favorites')->group(function () {
+            Route::get('/', [FavoriteProductControllerMobile::class, 'index']);
+            Route::post('/{product}', [FavoriteProductControllerMobile::class, 'store']);
+            Route::delete('/{product}', [FavoriteProductControllerMobile::class, 'destroy']);
+        });
+
+        Route::prefix('addresses')->group(function () {
+            Route::get('/', [UserAddressControllerMobile::class, 'index']);
+            Route::post('/', [UserAddressControllerMobile::class, 'store']);
+            Route::get('/{id}', [UserAddressControllerMobile::class, 'show']);
+            Route::put('/{id}', [UserAddressControllerMobile::class, 'update']);
+            Route::delete('/{id}', [UserAddressControllerMobile::class, 'destroy']);
+            Route::post('/{id}/default', [UserAddressControllerMobile::class, 'setDefault']);
+        });
+
+        Route::prefix('coupons')->group(function () {
+            Route::get('/', [CouponControllerMobile::class, 'index']);
+            Route::post('/validate', [CouponControllerMobile::class, 'validateCoupon']);
+        });
+
+        Route::prefix('notifications')->group(function () {
+            Route::get('/', [NotificationControllerMobile::class, 'index']);
+            Route::post('/read-all', [NotificationControllerMobile::class, 'markAllAsRead']);
+            Route::post('/{id}/read', [NotificationControllerMobile::class, 'markAsRead']);
         });
     });
 
@@ -148,10 +235,16 @@ Route::group(['prefix' => 'v1'], function () {
     Route::prefix("products")->group(function () {
         // lấy danh sách sản phẩm /api/v1/products
         Route::get("/", [ProductsControllerMobile::class, "index"]);
+        Route::get("/recommended", [ProductsControllerMobile::class, "recommended"]);
+        Route::get("/featured", [ProductsControllerMobile::class, "featured"]);
         // lấy danh sách sản phẩm theo danh mục /api/v1/products/get-products-by-category
         Route::get("/get-products-by-category", [ProductsControllerMobile::class, "getProductsByCategory"]);
         // lấy chi tiết sản phẩm /api/v1/products/get-products-details
         Route::get("/get-products-details", [ProductsControllerMobile::class, "getProductDetails"]);
+        Route::get("/{id}/ratings", [ProductRatingControllerMobile::class, "index"]);
+        Route::middleware(['auth:sanctum', 'role:customer'])->post("/{id}/ratings", [ProductRatingControllerMobile::class, "store"]);
+        Route::middleware(['auth:sanctum', 'role:customer'])->put("/{id}/ratings/{ratingId}", [ProductRatingControllerMobile::class, "update"]);
+        Route::middleware(['auth:sanctum', 'role:customer'])->delete("/{id}/ratings/{ratingId}", [ProductRatingControllerMobile::class, "destroy"]);
     });
     Route::group(['prefix' => 'artical'], function () {
         // lấy danh sách  bài viết  /api/v1/artical, truyền category_artical_id để lấy bài viết theo danh mục, truyền is_hot có value là 1 để lâý các bài viết nổi bật

@@ -12,11 +12,13 @@ import CouponDetails from "../components/Coupon/Details.vue";
 import Banner from "../components/Banner.vue";
 import Orders from "../components/Orders/index.vue";
 import OrderDetails from "../components/Orders/Details.vue";
+import Customers from "../components/Customers/Index.vue";
 import Transactions from "../components/Transactions/Index.vue";
 import HistoryPriceProduct from "../components/Transactions/HistoryPriceProduct.vue";
 import DetailCategorys from "../components/DetailCategories.vue";
 import Login from "../components/Auth/Login.vue";
 import Register from "../components/Auth/Register.vue";
+import Chat from "../components/Chat/Chat.vue";
 
 
 const routes = [
@@ -102,6 +104,16 @@ const routes = [
                 path: "orders/:id",
                 name: "ordersDetails",
                 component: OrderDetails,
+            },
+            {
+                path: "customers",
+                name: "customers",
+                component: Customers,
+            },
+            {
+                path: "chat",
+                name: "chat",
+                component: Chat,
             },
             {
                 path: "transactions",
