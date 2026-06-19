@@ -16,7 +16,7 @@ class DetailOrdersController extends Controller
         $order = OrderModel::with(['users', 'coupon'])->findOrFail($id);
 
         $query = OrderItemModel::where('order_id', $id)
-            ->with(['product', 'orderProductAttributeValueItemModel.attributeValue.attribute'])
+            ->with(['product.category', 'orderProductAttributeValueItemModel.attributeValue.attribute'])
             ->orderBy('id', 'desc');
 
         $detail = $query->paginate(50);
@@ -95,6 +95,19 @@ class DetailOrdersController extends Controller
                 'product_img' => $detail->product?->image,
                 'name' => $detail->product?->name,
                 'code' => $detail->product?->code,
+                'product_detail' => $detail->product ? [
+                    'id' => $detail->product->id,
+                    'name' => $detail->product->name,
+                    'code' => $detail->product->code,
+                    'image' => $detail->product->image,
+                    'category_name' => $detail->product->category?->name,
+                    'price' => $detail->product->price,
+                    'price_sale' => $detail->product->price_sale,
+                    'meta_title' => $detail->product->meta_title,
+                    'meta_description' => $detail->product->meta_description,
+                    'hashtag' => $detail->product->hashtag,
+                    'status' => $detail->product->status,
+                ] : null,
                 'order_id' => $detail->order_id,
                 'product_id' => $detail->product_id,
                 'product_variant_id' => $detail->product_variant_id,

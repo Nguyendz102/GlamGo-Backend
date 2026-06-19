@@ -3,12 +3,14 @@ import { ref, onMounted, watch, reactive } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
 import { useToast } from 'vue-toastification';
+import { Modal } from 'bootstrap';
 import { dateTimeFormat, formatNumber } from '../../utils';
 const ordersDetail = ref([]);
 const titleData = ref({});
 const loading = ref(true);
 const statusOrder = ref([]);
 const updateLoading = ref(false);
+const selectedProductDetail = ref(null);
 const route = useRoute();
 
 const orderId = route.params.id;
@@ -65,6 +67,22 @@ const getPaymentMethodName = (paymentMethod) => {
         default:
             return 'Không xác định';
     }
+};
+const productImageSrc = (image) => {
+    if (!image) {
+        return '/storage/categories/null.jpg';
+    }
+
+    if (image.startsWith('http://') || image.startsWith('https://') || image.startsWith('/storage/')) {
+        return image;
+    }
+
+    return `/storage/${image.replace(/^\/+/, '')}`;
+};
+const openProductDetail = (detail) => {
+    selectedProductDetail.value = detail;
+    const modal = new Modal(document.getElementById('orderProductDetailModal'));
+    modal.show();
 };
 const fetchStatusOptions = async (status) => {
     const response = await axios.get('/api/orders/status', {
@@ -292,12 +310,18 @@ onMounted(() => {
                             <tr v-else v-for="(detail, index) in ordersDetail" :key="detail.id">
                                 <td class="align-middle text-center">{{ index + 1 }}</td>
                                 <td class="align-middle text-center">
-                                    <img :src="`/storage/${detail.product_img || 'categories/null.jpg'}`"
-                                        alt="Product Image" style="border-radius: 10px;" width="90" height="70">
+                                    <img :src="productImageSrc(detail.product_img)"
+                                        alt="Product Image" class="cursor-pointer" style="border-radius: 10px;" width="90" height="70"
+                                        @click="openProductDetail(detail)">
                                 </td>
                                 <td class="align-middle text-start">
                                     <span class="align-middle text-start">
-                                        <b>Tên sản phẩm:</b> {{ detail.name }} <br />
+                                        <b>Tên sản phẩm:</b>
+                                        <button type="button" class="btn btn-link p-0 align-baseline"
+                                            @click="openProductDetail(detail)">
+                                            {{ detail.name }}
+                                        </button>
+                                        <br />
                                     </span>
                                     <span class="align-middle text-start">
                                         <b>Mã sản phẩm:</b> {{ detail.code }} <br />
@@ -360,6 +384,67 @@ onMounted(() => {
                     </div>
                 </div>
 
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="orderProductDetailModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content form-open">
+                <div class="modal-header">
+                    <h5 class="modal-title">Chi tiet san pham</h5>
+                    <button class="btn p-1 closeButton" type="button" data-bs-dismiss="modal" aria-label="Close">
+                        <span class="fas fa-times"></span>
+                    </button>
+                </div>
+                <div v-if="selectedProductDetail" class="modal-body">
+                    <div class="row g-4">
+                        <div class="col-12 col-md-4">
+                            <img :src="productImageSrc(selectedProductDetail.product_detail?.image || selectedProductDetail.product_img)"
+                                alt="Product Image" class="img-fluid rounded shadow-sm">
+                        </div>
+                        <div class="col-12 col-md-8">
+                            <h4 class="mb-2">{{ selectedProductDetail.product_detail?.name || selectedProductDetail.name }}</h4>
+                            <p class="text-body-tertiary mb-3">{{ selectedProductDetail.product_detail?.code || selectedProductDetail.code }}</p>
+
+                            <dl class="row mb-0">
+                                <dt class="col-sm-4">Danh muc</dt>
+                                <dd class="col-sm-8">{{ selectedProductDetail.product_detail?.category_name || 'Khong co' }}</dd>
+
+                                <dt class="col-sm-4">Gia ban</dt>
+                                <dd class="col-sm-8">{{ formatNumber(selectedProductDetail.product_detail?.price || selectedProductDetail.price) }} VND</dd>
+
+                                <dt class="col-sm-4">Gia sale</dt>
+                                <dd class="col-sm-8">{{ formatNumber(selectedProductDetail.product_detail?.price_sale || 0) }} VND</dd>
+
+                                <dt class="col-sm-4">So luong mua</dt>
+                                <dd class="col-sm-8">{{ selectedProductDetail.quantity }}</dd>
+
+                                <dt class="col-sm-4">Thanh tien</dt>
+                                <dd class="col-sm-8">{{ formatNumber(selectedProductDetail.total_price) }} {{ selectedProductDetail.current_coutry }}</dd>
+
+                                <dt class="col-sm-4">Thuoc tinh da chon</dt>
+                                <dd class="col-sm-8">
+                                    <template v-if="selectedProductDetail.order_attributes?.length">
+                                        <div v-for="(attributeGroup, groupIndex) in selectedProductDetail.order_attributes"
+                                            :key="groupIndex">
+                                            <div v-for="(attribute, attrIndex) in attributeGroup"
+                                                :key="`${groupIndex}-${attrIndex}`">
+                                                <b>{{ attribute?.attribute_name }}:</b> {{ attribute?.attribute_value }}
+                                            </div>
+                                        </div>
+                                    </template>
+                                    <span v-else>Khong co</span>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+
+                    <div v-if="selectedProductDetail.product_detail?.meta_description" class="mt-4">
+                        <h5>Mo ta</h5>
+                        <div class="text-body-secondary" v-html="selectedProductDetail.product_detail.meta_description"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

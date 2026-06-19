@@ -19,6 +19,7 @@ import DetailCategorys from "../components/DetailCategories.vue";
 import Login from "../components/Auth/Login.vue";
 import Register from "../components/Auth/Register.vue";
 import Chat from "../components/Chat/Chat.vue";
+import Reviews from "../components/Reviews/Index.vue";
 
 
 const routes = [
@@ -109,6 +110,11 @@ const routes = [
                 path: "customers",
                 name: "customers",
                 component: Customers,
+            },
+            {
+                path: "reviews",
+                name: "reviews",
+                component: Reviews,
             },
             {
                 path: "chat",

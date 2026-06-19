@@ -40,6 +40,7 @@ const getPaymentStatus = (status) => {
         ? { label: 'Đã thanh toán', color: 'rgb(8 205 47)' } // xanh
         : { label: 'Chưa thanh toán', color: 'rgb(200, 0, 0)' }; // đỏ đậm
 };
+const getOrderProducts = (transaction) => transaction?.order?.order_items || transaction?.order?.orderItems || [];
 onMounted(() => {
     fetchTransactions();
 });
@@ -107,6 +108,7 @@ const resetFilters = () => {
                     <thead>
                         <tr>
                             <th class="align-middle text-center text-uppercase">Stt</th>
+                            <th class="align-middle text-start text-uppercase">San pham</th>
                             <th class="align-middle text-start text-uppercase">Ngày</th>
                             <th class="align-middle text-start text-uppercase">Mã đơn hàng</th>
                             <th class="align-middle text-start text-uppercase">Phương thức thanh toán</th>
@@ -119,7 +121,7 @@ const resetFilters = () => {
                     </thead>
                     <tbody class="list-data" id="data_table_body">
                         <tr v-if="loading" class="loading-data">
-                            <td class="text-center" colspan="8">
+                            <td class="text-center" colspan="9">
                                 <div class="spinner-border text-info spinner-border-sm" role="status">
                                     <span class="visually-hidden">Loading...</span>
                                 </div>
@@ -130,9 +132,16 @@ const resetFilters = () => {
                         </tr>
                         <tr v-else v-for="(transaction, index) in transactions" :key="transaction.id">
                             <td class="align-middle text-center">{{ index + 1 }}</td>
+                            <td class="align-middle text-start">
+                                <div v-for="item in getOrderProducts(transaction)" :key="item.id" class="mb-1">
+                                    <span class="fw-semibold">{{ item.product?.name }}</span>
+                                    <span class="text-body-tertiary"> x{{ item.quantity }}</span>
+                                    <span class="text-body-tertiary"> - {{ formatNumber(item.total_price) }}</span>
+                                </div>
+                            </td>
                             <td class="align-middle text-start">{{ dateTimeFormat(transaction.created_at) }}</td>
                             <td class="align-middle text-start">
-                                <router-link v-if="transaction?.order?.id" :to="`/orders/${transaction.order.id}`">
+                                <router-link v-if="transaction?.order?.id" :to="{ name: 'ordersDetails', params: { id: transaction.order.id } }">
                                     {{ transaction.order.code ?? '' }}
                                 </router-link>
                                 <span v-else></span>

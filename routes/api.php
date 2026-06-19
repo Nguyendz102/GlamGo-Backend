@@ -24,6 +24,7 @@ use App\Http\Controllers\API\Product\ProductVariantController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\ChatController;
 use App\Http\Controllers\API\CustomerControllerApi;
+use App\Http\Controllers\API\RatingControllerApi;
 use App\Http\Controllers\API\Transactions\TransactionControllerApi;
 use App\Http\Controllers\BannerControllerApi;
 use App\Http\Controllers\CouponControllerApi;
@@ -69,6 +70,12 @@ Route::prefix("chat")->group(function () {
     Route::post("/customers/{customer}/messages", [ChatController::class, "adminSend"]);
     Route::post("/customers/{customer}/take-over", [ChatController::class, "adminTakeOver"]);
     Route::post("/customers/{customer}/release-to-bot", [ChatController::class, "adminReleaseToBot"]);
+});
+
+Route::prefix("ratings")->group(function () {
+    Route::get("/", [RatingControllerApi::class, "index"]);
+    Route::post("/{id}/reply", [RatingControllerApi::class, "reply"]);
+    Route::patch("/{id}/status", [RatingControllerApi::class, "updateStatus"]);
 });
 
 Route::prefix("dashboard")->group(function () {

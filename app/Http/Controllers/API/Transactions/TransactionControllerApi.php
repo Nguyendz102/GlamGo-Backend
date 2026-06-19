@@ -14,9 +14,10 @@ class TransactionControllerApi extends Controller
     {
         $query = TransactionsModel::with(
             'status',
-            'order',
-            'order.orderItems:id,order_id,product_id',
-            'order.orderItems.product:id,country_id',
+            'order:id,code,total_price,payment_method,payment_status,status,country_id,created_at,first_name,last_name,phone_number,email',
+            'order.country:id,current,rate,sign',
+            'order.orderItems:id,order_id,product_id,product_variant_id,price,quantity,total_price',
+            'order.orderItems.product:id,name,code,country_id',
             'order.orderItems.product.country:id,current,rate,sign'
         )->orderBy('created_at', 'desc');
         if (!empty($request->search)) {
@@ -36,14 +37,21 @@ class TransactionControllerApi extends Controller
             $query->whereBetween('created_at', [$startDate, $endDate]);
         }
 
+        $totalAmount = (clone $query)->get()->sum(function ($transaction) {
+            $rate = $transaction->order?->country?->rate
+                ?? $transaction->order?->orderItems?->first()?->product?->country?->rate
+                ?? 1;
+
+            return (float) $transaction->amount * (float) $rate;
+        });
+
         $data = $query->paginate(50);
 
-        $totalAmount = 0;
-
-        $data->getCollection()->transform(function ($transaction) use (&$totalAmount) {
-            $rate = $transaction->order->orderItems->first()->product->country->rate ?? 1;
+        $data->getCollection()->transform(function ($transaction) {
+            $rate = $transaction->order?->country?->rate
+                ?? $transaction->order?->orderItems?->first()?->product?->country?->rate
+                ?? 1;
             $transaction->total_price = $transaction->amount * $rate;
-            $totalAmount += $transaction->total_price;
             return $transaction;
         });
         $paginationData = $data->toArray();

@@ -46,7 +46,10 @@ class ProductControllerApi extends Controller
         $query = ProductsModel::with([
             'category:id,name',
             'productImages:id,product_id,image,image_alt',
-        ])->orderBy('created_at', 'desc');
+        ])
+            ->withCount('variants')
+            ->withSum('variants as stock_quantity', 'quantity')
+            ->orderBy('created_at', 'desc');
 
         if ($request->name) {
             $query->where('name', 'like', '%' . $request->name . '%');

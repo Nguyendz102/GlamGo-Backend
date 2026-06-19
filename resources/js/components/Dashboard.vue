@@ -20,7 +20,7 @@
                     <i class="fab fa-codepen text-success-emphasis"></i>
                 </div>
             </div>
-            <router-link to="orders" class="body text-decoration-none">
+            <router-link to="transactions" class="body text-decoration-none">
                 <p class="fw-bold m-0"><span class="thongke-khongkhoa">{{ formatNumber(dataDashboard.order_price)
                 }}</span> doanh thu thực nhận
                 </p>
@@ -66,7 +66,7 @@
                 </div>
             </div>
             <router-link :to="{
-                name: 'orders',
+                name: 'transactions',
                 query: {
                     start_date: startDate,
                     end_date: endDate
@@ -118,7 +118,7 @@
                             </div>
                             <div class="col-3 md-3 d-flex justify-content-end">
                                 <router-link class="nav-link label-1" :to="{
-                                    name: 'orders',
+                                    name: 'transactions',
                                     query: {
                                         start_date: startDate,
                                         end_date: endDate

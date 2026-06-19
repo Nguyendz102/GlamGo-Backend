@@ -15,6 +15,8 @@ const openSlug = () => {
 const loading = ref(true);
 const errors = ref({});
 const filters = ref({ name: '', code: '', country: '', tag: '' });
+const detailVariants = ref([]);
+const detailVariantsLoading = ref(false);
 const toast = useToast();
 
 const form = reactive({
@@ -393,6 +395,25 @@ const openModalShow = (product) => {
     const initModal = new Modal(modal)
     initModal.show();
     populateEditForm(product)
+    fetchDetailVariants(product.id);
+}
+const fetchDetailVariants = async (productId) => {
+    try {
+        detailVariantsLoading.value = true;
+        detailVariants.value = [];
+        const response = await axios.get(`/api/products/${productId}/variants`);
+        detailVariants.value = response.data.data || [];
+    } catch (error) {
+        console.error('Error fetching product variants:', error);
+        toast.error('Khong lay duoc danh sach bien the');
+    } finally {
+        detailVariantsLoading.value = false;
+    }
+}
+const detailVariantName = (variant) => {
+    return (variant.attributes || [])
+        .map((attribute) => `${attribute.attribute_name}: ${attribute.attribute_value}`)
+        .join(' / ');
 }
 const populateEditForm = (product) => {
     // Reset các ảnh mới nếu có
@@ -598,6 +619,7 @@ const populateEditForm = (product) => {
                     <thead>
                         <tr>
                             <th class="align-middle text-uppercase text-center">Stt</th>
+                            <th class="align-middle text-uppercase text-end">Ton kho</th>
                             <th class="align-middle text-uppercase text-center">Ảnh đại diện</th>
                             <th class="align-middle text-uppercase text-start">Tên</th>
                             <th class="align-middle text-uppercase text-start">Mã</th>
@@ -613,17 +635,21 @@ const populateEditForm = (product) => {
                     </thead>
                     <tbody class="list-data" id="data_table_body">
                         <tr v-if="loading" class="loading-data">
-                            <td class="text-center" colspan="13">
+                            <td class="text-center" colspan="14">
                                 <div class="spinner-border text-info spinner-border-sm" role="status">
                                     <span class="visually-hidden">Loading...</span>
                                 </div>
                             </td>
                         </tr>
                         <tr v-if="products.length === 0 && !loading">
-                            <td colspan="13" class="text-center fw-bold fs-7 text-danger">Chưa có dữ liệu</td>
+                            <td colspan="14" class="text-center fw-bold fs-7 text-danger">Chưa có dữ liệu</td>
                         </tr>
                         <tr v-for="(product, index) in products" :key="product.id">
                             <td class="align-middle text-center">{{ index + 1 }}</td>
+                            <td class="align-middle text-end">
+                                <span class="fw-bold">{{ product.stock_quantity || 0 }}</span>
+                                <span class="text-body-tertiary"> / {{ product.variants_count || 0 }} bien the</span>
+                            </td>
                             <td class="align-middle text-center">
                                 <img @click="openModalShow(product)"
                                     :src="product.image || '/storage/categories/null.jpg'" alt="Ảnh sản phẩm"
@@ -1412,6 +1438,63 @@ const populateEditForm = (product) => {
                                             <dt class=" col-sm-5 text-muted">ALT Ảnh</dt>
                                             <dd class="col-sm-7 fw-bold">{{ editForm.image_alt }}</dd>
                                         </dl>
+                                    </div>
+                                </div>
+
+                                <div class="card shadow-sm mt-4">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h6 class="fw-bold text-primary mb-0">Bien the ton kho</h6>
+                                            <span class="badge bg-info-subtle text-info-emphasis">
+                                                {{ detailVariants.length }} bien the
+                                            </span>
+                                        </div>
+                                        <div class="table-responsive scrollbar">
+                                            <table class="table table-hover table-sm fs-9 mb-0">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="text-uppercase text-start">Bien the</th>
+                                                        <th class="text-uppercase text-start">SKU</th>
+                                                        <th class="text-uppercase text-end">Gia rieng</th>
+                                                        <th class="text-uppercase text-end">So luong</th>
+                                                        <th class="text-uppercase text-center">Trang thai</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody v-if="detailVariantsLoading">
+                                                    <tr>
+                                                        <td colspan="5" class="text-center">
+                                                            <div class="spinner-border text-info spinner-border-sm"
+                                                                role="status"></div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                                <tbody v-else-if="detailVariants.length > 0">
+                                                    <tr v-for="variant in detailVariants" :key="variant.id">
+                                                        <td class="align-middle text-start">
+                                                            {{ detailVariantName(variant) || '-' }}
+                                                        </td>
+                                                        <td class="align-middle text-start">{{ variant.sku || '-' }}</td>
+                                                        <td class="align-middle text-end">
+                                                            {{ variant.price ? formatNumber(variant.price) : 'Theo gia san pham' }}
+                                                        </td>
+                                                        <td class="align-middle text-end fw-bold">{{ variant.quantity }}</td>
+                                                        <td class="align-middle text-center">
+                                                            <span class="badge"
+                                                                :class="variant.status == 1 ? 'bg-success-subtle text-success-emphasis' : 'bg-danger-subtle text-danger-emphasis'">
+                                                                {{ variant.status == 1 ? 'Dang ban' : 'Tam ngung' }}
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                                <tbody v-else>
+                                                    <tr>
+                                                        <td colspan="5" class="text-center fw-bold fs-7 text-danger">
+                                                            Chua co bien the ton kho
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
 
